@@ -1,0 +1,5 @@
+[user]
+	email = jakeferrari93@gmail.com
+	name = Jacob Ferrari
+[core]
+	editor = nvim

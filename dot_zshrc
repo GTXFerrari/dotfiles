@@ -1,0 +1,100 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename '/home/jake/.zshrc'
+
+autoload -Uz compinit
+compinit
+
+# End of lines added by compinstall
+source ~/ZSH/powerlevel10k/powerlevel10k.zsh-theme
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+#------------------------------------------------------------------------------------------------#
+# vim keymap
+bindkey -v
+
+###{Aliases}###
+
+## General ##
+alias cls="clear"
+alias ll="ls -al --color"
+alias la="ls -al --color"
+alias ls="ls --color"
+alias mkdir="mkdir -p"
+alias sus="sudo systemctl suspend"
+
+## Git ##
+alias gb="git branch"
+alias gc="git checkout"
+alias ga="git add ."
+alias gcom="git commit -m"
+alias gpsh="git push -u"
+alias gpll="git pull"
+alias gd="git diff"
+
+## Pacman ##
+alias pacin="sudo pacman -S"
+alias pacrm="sudo pacman -Rs"
+alias reflec="sudo reflector -c 'United States' -a 6 -p https --sort rate --save /etc/pacman.d/mirrorlist"
+alias pacref="sudo pacman -Syy"
+alias pacup="sudo pacman -Syu"
+alias pacchk="sudo pacman -Qs"
+
+## Make ##
+alias smci="sudo make clean install"
+alias smu="sudo make uninstall"
+
+# Neovim
+alias vim="nvim"
+alias vi="nvim"
+alias v="nvim"
+
+# GRUB
+alias grubup="sudo grub-mkconfig -o /boot/grub/grub.cfg"
+
+# Programs
+alias vm="virt-manager"
+alias ff="fastfetch"
+alias nf="neofetch"
+alias mus="ncmpcpp"
+alias bctl="bluetoothctl"
+alias yay="paru"
+alias lf="source /home/jake/.zprofile && /home/jake/.local/bin/lfub"
+
+# Easyeffects
+alias lcd2="easyeffects -l LCD2"
+alias egp="easyeffects -b"
+
+# SSH
+alias er4="ssh GTXFerrari@10.0.0.1"
+alias es10x="ssh ubnt@10.0.0.2"
+alias pihole="ssh jake@10.0.0.3"
+alias plex="ssh jake@10.0.0.201"
+alias nano="ssh GTXFerrari@10.0.0.4"
+
+# VM
+alias win11="sudo virsh start Windows_11"
+
+# Autosuggestions
+source ~/ZSH/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# Syntax Highlighting (Needs to be on bottom)
+source ~/ZSH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+
+# Path 
+export PATH="/home/jake/.local/bin:$PATH"
+#export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:$PATH"
