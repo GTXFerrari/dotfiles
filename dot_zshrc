@@ -12,12 +12,9 @@ SAVEHIST=1000
 # End of lines configured by zsh-newuser-install
 # The following lines were added by compinstall
 zstyle :compinstall filename '/home/jake/.zshrc'
-
 autoload -Uz compinit
 compinit
-
 # End of lines added by compinstall
-source ~/ZSH/powerlevel10k/powerlevel10k.zsh-theme
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -88,11 +85,10 @@ alias nano="ssh GTXFerrari@10.0.0.4"
 # VM
 alias win11="sudo virsh start Windows_11"
 
-# Autosuggestions
-source ~/ZSH/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-# Syntax Highlighting (Needs to be on bottom)
-source ~/ZSH/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# ZSH plugins
+source ~/.config/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.config/zsh/powerlevel10k/powerlevel10k.zsh-theme
+source ~/.config/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 
 # Path 
