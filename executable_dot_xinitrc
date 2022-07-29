@@ -48,21 +48,20 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
  unset f
 fi
 
+# DWM
+setxkbmap -option caps:escape &
 source .zprofile &
 nitrogen --restore &
 picom -b --experimental-backends &
-#dwmblocks &
+dwmblocks &
 dunst &
 nm-applet &
 steam --silent &
-pcmanfm-qt -d &
-#lutris &
-#virt-manager &
+pcmanfm -d &
 pasystray &
 discord --start-minimized &
 blueman-applet &
 /opt/piavpn/bin/pia-client &
 [ ! -s ~/.config/mpd/pid ] && mpd &
 easyeffects --gapplication-service &
-sh /home/jake/Git/dwm-bar/dwm_bar.sh &
 exec dwm

@@ -32,6 +32,7 @@ alias la="ls -al --color"
 alias ls="ls --color"
 alias mkdir="mkdir -p"
 alias sus="sudo systemctl suspend"
+alias gptmp="nvidia-smi -q -d TEMPERATURE"
 
 ## Git ##
 alias gb="git branch"
@@ -43,7 +44,7 @@ alias gpll="git pull"
 alias gd="git diff"
 
 ## Pacman ##
-alias pacin="sudo pacman -S"
+alias pacin=" sudo pacman -Syy && sudo pacman -S"
 alias pacrm="sudo pacman -Rs"
 alias reflec="sudo reflector -c 'United States' -a 6 -p https --sort rate --save /etc/pacman.d/mirrorlist"
 alias pacref="sudo pacman -Syy"
@@ -64,6 +65,7 @@ alias grubup="sudo grub-mkconfig -o /boot/grub/grub.cfg"
 
 # Programs
 alias vm="virt-manager"
+alias nb="newsboat"
 alias ff="fastfetch"
 alias nf="neofetch"
 alias mus="ncmpcpp"
@@ -85,6 +87,8 @@ alias nano="ssh GTXFerrari@10.0.0.4"
 # VM
 alias win11="sudo virsh start Windows_11"
 
+# NeoVIM
+
 # ZSH plugins
 source ~/.config/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.config/zsh/powerlevel10k/powerlevel10k.zsh-theme
@@ -93,4 +97,10 @@ source ~/.config/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Path 
 export PATH="/home/jake/.local/bin:$PATH"
+export PATH="/home/jake/.local/bin/statusbar:$PATH"
+
+
 #export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:$PATH"
+
+# Environment
+export EDITOR=nvim
