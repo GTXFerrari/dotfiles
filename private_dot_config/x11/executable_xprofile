@@ -1,0 +1,22 @@
+#!/bin/bash
+
+xrdb ${XDG_CONFIG_HOME:-$HOME/.config}/x11/xresources & xrdbpid=$!
+
+xrandr --dpi 96
+
+picom & 
+nitrogen --restore &
+steam --silent &
+discord --start-minimized &
+dunst & 
+nm-applet &
+pcmanfm -d &
+pasystray &
+#/opt/piavpn/bin/pia-client &
+[ ! -s ~/.config/mpd/pid ] && mpd &
+easyeffects --gapplication-service &
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+dwmblocks & 
+
+# Ensure xrdb has finished before moving on to start the WM/DE
+[ -n "$xrdbpid" ] && wait "$xrdbpid"

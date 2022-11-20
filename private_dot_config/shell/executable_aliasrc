@@ -1,0 +1,96 @@
+#!/bin/sh
+
+# Use neovim for vim if present.
+[ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+
+# Use $XINITRC variable if file exists.
+[ -f "$XINITRC" ] && alias startx="startx $XINITRC"
+
+# sudo not required for some system commands
+for command in mount umount sv pacman updatedb su shutdown poweroff reboot ; do
+	alias $command="sudo $command"
+done; unset command
+
+se() { cd ~/.local/bin; $EDITOR $(fzf) ;}
+
+# Verbosity and settings that you pretty much just always are going to want.
+alias \
+	cp="cp -iv" \
+	mv="mv -iv" \
+	rm="rm -vI" \
+	bc="bc -ql" \
+	mkdir="mkdir -pv" \
+
+# Colorize commands when possible.
+alias \
+	ls="ls -hN --color=auto --group-directories-first" \
+	grep="grep --color=auto" \
+	diff="diff --color=auto" \
+	ccat="highlight --out-format=ansi" \
+	ip="ip -color=auto" \
+
+# These common commands are just too long! Abbreviate them.
+alias \
+	ka="killall" \
+	sdn="shutdown -h now" \
+	e="$EDITOR" \
+	v="$EDITOR" \
+
+# General 
+alias \
+	lf="lfub" \
+  smci="sudo make clean install" \
+  cls="clear" \
+  ll="ls -al" \
+  la="ls -al" \
+  sus="sudo systemctl suspend" \
+  gputmp="nvidia-smi -q -d TEMPERATURE" \
+
+# Git
+alias \
+    gb="git branch" \
+    gc="git checkout" \
+    ga="git add ." \
+    gcom="git commit -m" \
+    gpsh="git push" \
+    gpll="git pull" \
+    gd="git diff" \
+    gs="git status" \
+    gl="git log" \
+
+# pacman
+alias \
+    pacin="sudo pacman -S" \
+    pacrm="sudo pacman -Rs" \
+    pacref="sudo pacman -Syy" \
+    pacup="sudo pacman -Syu" \
+    pacchk="sudo pacman -Qs" \
+    reflec="sudo reflector -c 'United States' -a 6 -p https --sort rate --save /etc/pacman.d/mirrorlist" \
+
+# make
+alias \
+    smci="sudo make clean install" \
+    smu="sudo make uninstall" \
+
+# Grub
+alias \
+    grubin="sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader=GRUB" \
+    grubup="sudo grub-mkconfig -o /boot/grub/grub.cfg" \
+
+# initramfs
+alias \
+    initram="sudo mkinitcpio -P" \
+
+# Programs
+alias \
+    vm="virt-manager" \
+    nf="neofetch" \
+    ff="fastfetch" \
+    mus="ncmpcpp" \
+    bctl="bluetoothctl" \
+    yay="paru" \
+
+# Easyeffects
+alias \
+    lcd2="easyeffects -l LCD2" \
+    egp="easyeffects -b" \
