@@ -1,2 +1,38 @@
+# Launch Programs
 
-# Basic binds
+# Nemo (File Manager)
+super + shift + e
+        nemo
+
+# htop
+super + shift + Escape
+        $TERMINAL -e btop 
+
+# firefox
+super + shift + f 
+        firefox
+
+# lf
+super + e
+        $TERMINAL -e lfub
+
+# ncmpcpp
+super + shift + m 
+        $TERMINAL -e ncmpcpp
+
+# Workstation Pro 
+super + shift + p 
+        vmware
+
+# Media Keys 
+XF86AudioRaiseVolume
+        amixer set Master 2%+
+
+XF86AudioLowerVolume
+        amixer set Master 2%-
+
+XF86AudioMute
+        amixer set Master mute
+
+super + shift + Delete
+        amixer set Master unmute 

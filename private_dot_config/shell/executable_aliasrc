@@ -92,5 +92,5 @@ alias \
 
 # Easyeffects
 alias \
-    lcd2="easyeffects -l LCD2" \
-    egp="easyeffects -b" \
+    LCD2="easyeffects -l LCD2" \
+    JBL="easyeffects -l JBL" \

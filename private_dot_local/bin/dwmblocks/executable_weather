@@ -1,0 +1,5 @@
+#!/bin/sh
+
+LOCATION=Tustin
+DATA=$(curl -s wttr.in/$LOCATION?format=1)
+echo $DATA
