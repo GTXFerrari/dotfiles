@@ -1,18 +1,38 @@
 #!/bin/sh 
 
-#STATUS=$(amixer sget Master | tail -n1 | sed -r "s/.*\[(.*)\]/\1/")
-#VOL=$(amixer get Master | tail -n1 | sed -r "s/.*\[(.*)%\].*/\1/")
+# Prints the current volume or 🔇 if muted.
 
-#if [ "$STATUS" = "off" ]; then
-#  printf ="🔇"
-#  else
-#  if [ "$VOL" -gt 0 ] && [ "$VOL" -le 33 ]; then
-#    printf "🔈 %s%%" "$VOL"
-#  elif [ "$VOL" -gt 33 ] && [ "$VOL" -le 66 ]; then
-#    printf "🔉 %s%%" "$VOL"
-#  else
-#    printf "🔊 %s%%" "$VOL"
-#  fi
-#fi
-vol="$(amixer get Master | tail -n1 | sed -r 's/.*\[(.*)%\].*/\1/')"
-echo "${vol}% volume "
+case $BLOCK_BUTTON in
+	1) setsid -f "$TERMINAL" -e pulsemixer ;;
+	2) pamixer -t ;;
+	4) pamixer --allow-boost -i 1 ;;
+	5) pamixer --allow-boost -d 1 ;;
+	3) notify-send "📢 Volume module" "\- Shows volume 🔊, 🔇 if muted.
+- Middle click to mute.
+- Scroll to change." ;;
+	6) "$TERMINAL" -e "$EDITOR" "$0" ;;
+esac
+
+vol="$(wpctl get-volume @DEFAULT_AUDIO_SINK@)"
+
+# If muted, print 🔇 and exit.
+[ "$vol" != "${vol%\[MUTED\]}" ] && echo 🔇 && exit
+
+vol="${vol#Volume: }"
+split() {
+	# For ommiting the . without calling and external program.
+	IFS=$2
+	set -- $1
+	printf '%s' "$@"
+}
+vol="$(split "$vol" ".")"
+vol="${vol##0}"
+
+case 1 in
+	$((vol >= 70)) ) icon="🔊" ;;
+	$((vol >= 30)) ) icon="🔉" ;;
+	$((vol >= 1)) ) icon="🔈" ;;
+	* ) echo 🔇 && exit ;;
+esac
+
+echo "$icon$vol%"
