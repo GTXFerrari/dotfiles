@@ -20,6 +20,7 @@ alias \
 	rm="rm -vI" \
 	bc="bc -ql" \
 	mkdir="mkdir -pv" \
+# unzip="for z in *.zip; do unzip "$z" -d "${z%".zip"}"; done"
 
 # Colorize commands when possible.
 alias \
