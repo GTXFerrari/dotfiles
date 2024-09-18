@@ -108,7 +108,6 @@ alias \
 alias \
 	ff='fastfetch' \
   mus='ncmpcpp' \
-  lf='lfub' \
 
 # Easyeffects
 alias \
