@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+kern="$(uname -r)"
+echo -e "$kern "

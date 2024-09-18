@@ -1,0 +1,126 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+############################################################################################
+# Supress P10K instant prompt
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+
+# Load colors if not using a prompt ie P10K
+#autoload -U colors && colors
+#PS1="%B%{$fg[red]%}[%{$fg[yellow]%}%n%{$fg[green]%}@%{$fg[blue]%}%M %{$fg[magenta]%}%~%{$fg[red]%}]%{$reset_color%}$%b "
+
+# Options
+setopt autocd # Automatically cd into typed dir
+setopt interactive_comments
+setopt SHARE_HISTORY
+HISTSIZE=10000000
+SAVEHIST=10000000
+HISTFILE=$HOME/.config/.zhistory
+setopt HIST_EXPIRE_DUPS_FIRST
+
+# Use neovim for vim if present
+[ -x '$(command -v nvim)' ] && alias vim='nvim' vimdiff='nvim -d'
+
+# Vim Bindings
+bindkey -v
+export KEYTIMEOUT=1
+
+# Completions
+autoload -U compinit
+zstyle ':completions:*' menu select
+zmodload zsh/complist
+compinit
+_comp_options+=(globdots) # Include hidden files
+
+# Environment Variables
+export BROWSER='firefox'
+export EDITOR='nvim'
+export TERMINAL='kitty'
+
+#PATH
+path+=('/home/jake/.local/bin/dwmblocks/')
+path+=('/home/jake/.local/bin/')
+export PATH
+
+## {Alias} ##
+
+# General shortcuts
+alias \
+	e='$EDITOR' \
+	v='$EDITOR' \
+	cls='clear' \
+	ll='ls -al' \
+	la='ls -al' \
+  rm='rm -vI' \
+  mv='mv -iv' \
+  cp='cp -iv' \
+  mkdir='mkdir -pv' \
+
+# Git
+alias \
+	gb='git branch' \
+	gc='git checkout' \
+	ga='git add .' \
+	gcom='git commit -m' \
+	gd='git diff' \
+	gs='git status' \
+
+# Make
+alias \
+	smci='sudo make clean install' \
+	smcu='sudo make clean uninstall' \
+
+# Grub (Arch only)
+alias \
+	grubin='sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader=GRUB' \
+	grubup='sudo grub-mkconfig -o /boot/grub/grub.cfg' \
+
+# Mkinitcpio (Arch only)
+alias \
+	initram='sudo mkinitcpio -P' \
+
+# Package Managers
+#APT
+alias \
+	aptin='sudo apt-get install' \
+	aptrm='sudo apt-get remove' \
+	aptref='sudo apt-get update' \
+	aptup='sudo apt-get upgrade' \
+#Pacman
+alias \
+	pacin='sudo pacman -S' \
+	pacrm='sudo pacman -Rs' \
+	pacref='sudo pacman -Syy' \
+	pacup='sudo pacman -Syu' \
+  reflec='sudo reflector -c "United States" -a 12 -p https --sort rate --save /etc/pacman.d/mirrorlist' \
+
+# Colorize
+alias \
+	ls='ls -hN --color=auto --group-directories-first' \
+	grep='grep --color=auto' \
+	diff='diff --color=auto' \
+	ip='ip --color=auto' \
+
+# Programs
+alias \
+	ff='fastfetch' \
+  mus='ncmpcpp' \
+  lf='lfub' \
+
+# Easyeffects
+alias \
+	LCD2='easyeffects -l LCD2' \
+	JBL='easyeffects -l JBL' \
+
+# Source Plugins
+source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+
+
+################################################################################################
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

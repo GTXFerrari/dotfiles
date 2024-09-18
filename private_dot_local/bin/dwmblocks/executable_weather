@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+LOCATION=Irvine
+DATA=$(curl -s "wttr.in/Irvine?format"="%l:+%C+%t++%m\n")
+echo $DATA
