@@ -67,6 +67,7 @@ alias \
 	gcom='git commit -m' \
 	gd='git diff' \
 	gs='git status' \
+  lg='lazygit' \
 
 # Make
 alias \
