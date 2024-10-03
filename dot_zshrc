@@ -41,8 +41,9 @@ export EDITOR='nvim'
 export TERMINAL='kitty'
 
 #PATH
-path+=('/home/jake/.local/bin/dwmblocks/')
 path+=('/home/jake/.local/bin/')
+path+=('/home/jake/.local/bin/scripts/')
+path+=('/home/jake/.local/bin/dwmblocks/')
 export PATH
 
 ## {Alias} ##
@@ -120,7 +121,13 @@ source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 
-
 ################################################################################################
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# bun completions
+[ -s "/home/jake/.bun/_bun" ] && source "/home/jake/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
