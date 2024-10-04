@@ -1,4 +1,7 @@
+mode=drun
+allow-images=true
+image_size=50
 hide_scroll=true
 prompt=
-normal_window=true
+normal_window=false
 no_actions=true
