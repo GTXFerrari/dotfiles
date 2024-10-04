@@ -2,6 +2,6 @@
 cd ~/Pictures/Wallpapers/
 while true; do
   file="$(ls *.jpg | sort -R | tail -1)"
-  swww img "$file" --transition-fps 165 --transition-type none
+  swww img "$file" --transition-fps 165 --transition-type random
   sleep 300
 done
