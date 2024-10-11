@@ -5,12 +5,8 @@ set scrolloff 10
 set icons
 set period 1
 set hiddenfiles ".*:*.aux:*.log:*.bbl:*.bcf:*.blg:*.run.xml"
-set previewer ctpv
-set cleaner ctpvclear
-set sixel true
-&ctpv -s $id
-&ctpvquit $id
-set icons
+set previewer ~/.config/lf/previewer
+set cleaner ~/.config/lf/cleaner
 
 # cmds/functions
 cmd open ${{
