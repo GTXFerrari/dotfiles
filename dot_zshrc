@@ -121,6 +121,12 @@ alias \
   gdl='source ~/Code/Python/VENV/gallery-dl/bin/activate' \
   comfy='source ~/Code/Python/VENV/comfyui/bin/activate' \
 
+# Chezmoi
+alias \
+  cs='chezmoi status' \
+  ccd='chezmoi cd' \
+  cm='chezmoi merge' \
+
 # Source Plugins
 source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
