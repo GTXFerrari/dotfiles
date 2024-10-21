@@ -330,8 +330,8 @@ mpd_music_dir = /mnt/truenas/media/Music/Library/
 ## Note: Custom command that will be executed each time song changes. Useful for
 ## notifications etc.
 ##
-#execute_on_song_change = ""
-#
+execute_on_song_change = notify-send "Now Playing" "$(mpc --format '%title% \n%artist% - %album%' current)"
+execute_on_song_change = songinfo
 ##
 ## Note: Custom command that will be executed each time player state
 ## changes. The environment variable MPD_PLAYER_STATE is set to the current
