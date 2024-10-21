@@ -110,6 +110,11 @@ alias \
 alias \
 	ff='fastfetch' \
   mus='ncmpcpp' \
+  ytdl='yt-dlp' \
+  hb='ghb' \
+  hbcli='HandBrakeCLI' \
+  s='kitten ssh'
+
 
 # Easyeffects
 alias \
