@@ -1,0 +1,168 @@
+/* Main Waybar Window */
+window#waybar {
+    font-family: "JetBrains Mono NerdFont";
+    background-color: rgba(0 ,0 ,0 ,0);
+    font-size: 1rem;
+}
+
+
+/* Left Side Modules */
+.modules-left {
+  margin-top: 0.5em;
+  margin-bottom: 0.5rem;
+  margin-left: 0.5em;
+  opacity: 0.8;
+  background-color: rgba(0,0,0,1);
+  border-radius: 0.7rem;
+  color: snow;
+}
+
+
+ /* Center Modules */
+.modules-center {
+  margin-top: 0.5em;
+  margin-bottom: 0.5rem;
+  margin-right: 100px;
+  opacity: 0.8;
+  /*background-color: rgba(0,0,0,1);*/
+  background-color: black;
+  border-radius: 0.7rem;
+  padding: 2px;
+  color: snow;
+}
+
+
+/* Right Side Modules */
+.modules-right {
+  margin-top: 0.35em;  /* Floating */
+  margin-bottom: 0.5rem;
+  margin-right: 0.35em;
+  opacity: 0.8;
+  background-color: rgba(0,0,0,1);
+  border-radius: 0.7rem;
+  padding: 10px;
+  color: snow;
+}
+
+  #workspaces {
+      border: double 2px transparent;
+      border-radius: 12px;
+      background-image: linear-gradient(@bg, @bg),
+                          linear-gradient(45deg, @bright-magenta, @bright-blue);
+      background-origin: border-box;
+      background-clip: content-box, border-box;
+    
+      margin-top: 6px;
+      margin-bottom: 6px;
+  }
+    
+  #workspaces button {
+      margin-left: 2px;
+      margin-right: 2px;
+      margin-top: 2px;
+      margin-bottom: 2px;
+      padding-top: 0px;
+      padding-bottom: 0px;
+    
+      border-radius: 8px;
+      background-color: @bright-magenta;
+      color: @fg;
+    
+      border: none;
+  }
+    
+  #workspaces button.persistent {
+      color: @fg;
+      background-color: @bg;
+  }
+    
+  #workspaces button.active {
+      color: @fg;
+      background-color: @bright-blue;
+  }
+
+
+
+/*#workspaces {*/
+/*  padding: 1px;*/
+/*}*/
+/**/
+/*#workspaces button {*/
+/*  padding:  0.5em;*/
+/*  padding: 10px;*/
+/*}*/
+/**/
+/*#workspaces button.empty {*/
+/*  color: @overlay0;*/
+/*}*/
+/**/
+/*#workspaces button.visible {*/
+/*  color: @blue;*/
+/*}*/
+/**/
+/*#workspaces button.persistent {*/
+/*  color: @fg;*/
+/*  background-color: @bg;*/
+/*}*/
+/**/
+/*#workspaces button.active {*/
+/*  color: @green;*/
+/*}*/
+/**/
+/*#workspaces button.urgent {*/
+/*  background-color: @red;*/
+/*  border-radius: 1em;*/
+/*  color: @text;*/
+/*}*/
+
+
+#window {
+  /*background-color: rgba(0,0,0,0.5);*/
+  /*border-radius: 0.5rem;*/
+  padding: 5px;
+}
+
+window#waybar.empty #window {
+    background-color: transparent;
+}
+
+
+/* Clock */
+#clock {
+  font-weight: normal;
+  border-radius: 0.5rem;
+  padding: 0 3px 0 0;
+}
+
+
+/* Tray */
+#tray {
+  /*padding: 5px; */
+}
+
+#tray menu {
+}
+
+#tray > .passive {
+}
+
+#tray > .active {
+}
+
+#tray > .needs-attention {
+}
+
+
+/* Audio (Wireplumber) */
+#wireplumber {
+}
+
+#wireplumber.muted {
+}
+
+/* SwayNC */
+#custom-notification {
+  font-family: "NotoSansMono Nerd Font";
+  margin-bottom: 5px;
+  margin-right: 5px;
+}
