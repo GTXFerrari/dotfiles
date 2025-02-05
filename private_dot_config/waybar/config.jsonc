@@ -4,7 +4,7 @@
   // "position": "bottom", // Waybar position (top|bottom|left|right)
   // "height": 30, // Waybar height (to be removed for auto height)
   // "width": 1280, // Waybar width
-  "spacing": 6, // Gaps between modules (4px)
+  "spacing": 4, // Gaps between modules (4px)
   // Choose the order of the modules
   "modules-left": [
     "hyprland/workspaces"
@@ -75,52 +75,52 @@
     "on-click": "kitty -e ncmpcpp"
   },
   "cpu": {
-    "format": "  CPU {usage}% ||",
+    "format": "  CPU {usage}% | ",
     "tooltip": false
   },
   "memory": {
-    "format": " RAM {}% || "
+    "format": "  RAM {}% | "
   },
   "custom/gpu-usage": {
     "exec": "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits",
-    "format": "  GPU {}% ||",
+    "format": "   GPU {}% | ",
     "interval": 1
   },
   "disk": {
     "interval": 30,
-    "format": "  {used}/{total} ||",
+    "format": "   {used}/{total} | ",
     "unit": "GB"
   },
   "wireplumber": {
-    "format": "{icon}  {volume}% ||",
-    "format-muted": " Mute ||",
+    "format": "{icon}  {volume}% | ",
+    "format-muted": " Mute | ",
     "on-click": "pavucontrol",
     "format-icons": [
-      "",
-      "",
-      ""
+      " ",
+      " ",
+      " "
     ],
     "max-volume": 100,
     "scroll-step": 1
   },
   "clock": {
     "timezone": "America/Los_Angeles",
-    "format": "{:%a (%I:%M%p) - %D} ||",
+    "format": "{:%a (%I:%M%p) - %D}   ",
     "tooltip": false
     // "format-alt": "{:%A %D}"
   },
   "tray": {
-    "icon-size": 24,
-    "spacing": 10
+    "icon-size": 18,
+    "spacing": 8
   },
   "network": {
     // "interface": "wlp2*", // (Optional) To force the use of this interface
-    "format-wifi": "{essid} ({signalStrength}%)  ||",
-    "format-ethernet": " {ipaddr}/{cidr} ||",
-    "tooltip-format": "{ifname} via {gwaddr}  ||",
-    "format-linked": "{ifname} (No IP)  ||",
-    "format-disconnected": "Disconnected ⚠ ||",
-    "format-alt": "{ifname}: {ipaddr}/{cidr} ||"
+    "format-wifi": "{essid} ({signalStrength}%)  | ",
+    "format-ethernet": "  {ipaddr}/{cidr} | ",
+    "tooltip-format": "{ifname} via {gwaddr}  | ",
+    "format-linked": "{ifname} (No IP)  | ",
+    "format-disconnected": "Disconnected ⚠ | ",
+    "format-alt": "{ifname}: {ipaddr}/{cidr} | "
   },
   "custom/power": {
     "format": "⏻ ",

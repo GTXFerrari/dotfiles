@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-core=$(checkupdates | wc -l)
-aur=$(paru -Qum | wc -l)
-echo "$core Core - $aur AUR"
