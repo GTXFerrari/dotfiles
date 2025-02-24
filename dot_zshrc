@@ -124,7 +124,7 @@ alias \
 
 # Python VENV
 alias \
-  gdl='source ~/Code/Python/VENV/gallery-dl/bin/activate' \
+  gallery-dl='source ~/Code/Python/VENV/gallery-dl/bin/activate && gallery-dl' \ 
   comfy='source ~/Code/Python/VENV/comfyui/bin/activate' \
 
 # Chezmoi
