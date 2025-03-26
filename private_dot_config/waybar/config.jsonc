@@ -1,157 +1,172 @@
-// -*- mode: jsonc -*-
 {
-  // "layer": "top", // Waybar at top layer
-  // "position": "bottom", // Waybar position (top|bottom|left|right)
-  // "height": 30, // Waybar height (to be removed for auto height)
-  // "width": 1280, // Waybar width
-  "spacing": 4, // Gaps between modules (4px)
-  // Choose the order of the modules
-  "modules-left": [
-    "hyprland/workspaces"
-  ],
-  "modules-center": [
-    "hyprland/window"
-  ],
-  "modules-right": [
-    // "idle_inhibitor",
-    // "pulseaudio",
-    // "power-profiles-daemon",
-    "cpu",
-    "memory",
-    "custom/gpu-usage",
-    "disk",
-    "network",
-    // "mpd",
-    "wireplumber",
-    // "backlight",
-    "clock",
-    "tray",
-    "custom/notification"
-    // "custom/power"
-  ],
-  // Modules configuration
-  "hyprland/workspaces": {
-    // "show-special": true,
-    // "special-visible-only": true,
-    // "persistent-workspaces": {
-    //   "*": 2
-    // },
-    "active-only": false,
-    "all-outputs": false
-    // "format": "[{name}] {icon}",
-    // "format-icons": {
-    //   "1": " ",
-    //   "2": " ",
-    //   "3": " ",
-    //   "4": " ",
-    //   "5": " ",
-    //   "urgent": "",
-    //   "focused": "",
-    //   "default": ""
-    // }
-  },
-  "hyprland/window": {
-    "format": "{title}",
-    "icon": true,
-    "icon-size": 24,
-    "tooltip": false,
-    "max-length": 75
-  },
-  "mpd": {
-    "format": "{stateIcon} {consumeIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ({songPosition}|{queueLength}) ",
-    "format-disconnected": "Disconnected ",
-    "format-stopped": " MPD ",
-    "unknown-tag": "N/A",
-    "interval": 5,
-    "consume-icons": {
-      "on": " "
-    },
-    "state-icons": {
-      "paused": "",
-      "playing": ""
-    },
-    "tooltip-format": "MPD (connected)",
-    "tooltip-format-disconnected": "MPD (disconnected)",
-    "on-click": "kitty -e ncmpcpp"
-  },
-  "cpu": {
-    "format": "  CPU {usage}% | ",
-    "tooltip": false
-  },
-  "memory": {
-    "format": "  RAM {}% | "
-  },
-  "custom/gpu-usage": {
-    "exec": "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits",
-    "format": "   GPU {}% | ",
-    "interval": 1
-  },
-  "disk": {
-    "interval": 30,
-    "format": "   {used}/{total} | ",
-    "unit": "GB"
-  },
-  "wireplumber": {
-    "format": "{icon}  {volume}% | ",
-    "format-muted": " Mute | ",
-    "on-click": "pavucontrol",
-    "format-icons": [
-      " ",
-      " ",
-      " "
+    "layer": "top",
+    "position": "top",
+    "spacing": 0,
+    "height": 32,
+    "modules-left": [
+        "custom/logo",
+        "hyprland/workspaces"
     ],
-    "max-volume": 100,
-    "scroll-step": 1
-  },
-  "clock": {
-    "timezone": "America/Los_Angeles",
-    "format": "{:%a (%I:%M%p) - %D}   ",
-    "tooltip": false
-    // "format-alt": "{:%A %D}"
-  },
-  "tray": {
-    "icon-size": 18,
-    "spacing": 8
-  },
-  "network": {
-    // "interface": "wlp2*", // (Optional) To force the use of this interface
-    "format-wifi": "{essid} ({signalStrength}%)  | ",
-    "format-ethernet": "  {ipaddr}/{cidr} | ",
-    "tooltip-format": "{ifname} via {gwaddr}  | ",
-    "format-linked": "{ifname} (No IP)  | ",
-    "format-disconnected": "Disconnected ⚠ | ",
-    "format-alt": "{ifname}: {ipaddr}/{cidr} | "
-  },
-  "custom/power": {
-    "format": "⏻ ",
-    "tooltip": false,
-    "menu": "on-click",
-    "menu-file": "$HOME/.config/waybar/power_menu.xml", // Menu file in resources folder
-    "menu-actions": {
-      "shutdown": "shutdown",
-      "reboot": "reboot",
-      "suspend": "systemctl suspend",
-      "hibernate": "systemctl hibernate"
-    }
-  },
-  "custom/notification": {
-    "tooltip": false,
-    "format": "  {icon}",
-    "format-icons": {
-      "notification": "<span foreground='red'><sup></sup></span>",
-      "none": "",
-      "dnd-notification": "<span foreground='red'><sup></sup></span>",
-      "dnd-none": "",
-      "inhibited-notification": "<span foreground='red'><sup></sup></span>",
-      "inhibited-none": "",
-      "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
-      "dnd-inhibited-none": ""
+    "modules-center": [
+        "hyprland/window"
+    ],
+    "modules-right": [
+        "tray",
+	"custom/kernel",
+	"cpu",
+        "memory",
+	"custom/diskfree",
+        "clock",
+        "wireplumber",
+        "custom/power"
+    ],
+    "wlr/taskbar": {
+        "format": "{icon}",
+        "on-click": "activate",
+        "on-click-right": "fullscreen",
+        "icon-theme": "WhiteSur",
+        "icon-size": 25,
+        "tooltip-format": "{title}"
     },
-    "return-type": "json",
-    "exec-if": "which swaync-client",
-    "exec": "swaync-client -swb",
-    "on-click": "swaync-client -t -sw",
-    "on-click-right": "swaync-client -d -sw",
-    "escape": true
-  }
+    "hyprland/workspaces": {
+        "on-click": "activate",
+        "disable-scroll": true,
+        "all-outputs": true,
+        "warp-on-scroll": false,
+        "format": "{name}: {icon}",
+        "format-icons": {
+            "default": "",
+            "1": "",
+            "2": "",
+            "3": "",
+            "4": "",
+            "5": "",
+            "8": "",
+            "9": "",
+            //"active": "󱓻",
+            //"urgent": "󱓻"
+        },
+        "persistent_workspaces": {
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
+            "7": [],
+            "8": [],
+            "9": []
+        }
+    },
+    "cpu": {
+        "format": "   Cpu: {usage}%" ,
+        "tooltip": false
+    },
+    "memory": {
+        "interval": 5,
+        "format": "  Mem: {}%",
+        "max-length": 15
+    },
+    "tray": {
+        "spacing": 10,
+        "icon-size": 22
+    },
+    "clock": {
+        "tooltip-format": "{calendar}",
+        "format-alt": "  {:%a, %b %d %Y}",
+        "format": "⏱  {:%a, %b %d - %H:%M}"
+    },
+    "network": {
+        "format-wifi" : "{icon}",
+        "format-icons": ["󰤯","󰤟","󰤢","󰤥","󰤨"],
+        "format-ethernet": "󰀂",
+	"format-alt" : "󱛇",
+        "format-disconnected" : "󰖪",
+	"tooltip-format-wifi": "{icon} {essid}\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+        "tooltip-format-ethernet": "󰀂  {ifname}\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+	"tooltip-format-disconnected": "Disconnected",
+	"on-click": "~/.config/rofi/wifi/wifi.sh &",
+        "on-click-right": "~/.config/rofi/wifi/wifinew.sh &",
+	"interval": 5,
+	"nospacing": 1,
+    },
+    "wireplumber": {
+        "format": "{icon}",
+        "format-bluetooth": "󰂰",
+        "nospacing": 1,
+        "tooltip-format": "Volume : {volume}%",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "headphone": "",
+            "default": ["󰖀","󰕾",""]
+        },
+        "on-click": "pamixer -t",
+        "scroll-step": 1
+    },
+    "custom/logo": {
+        "format": "  ",
+        "tooltip": false,
+        "on-click": "~/.config/rofi/launchers/misc/launcher.sh &"
+    },
+    "battery": {
+        "format": "{capacity}% {icon}",
+        "format-icons": {
+            "charging": [
+                "󰢜",
+                "󰂆",
+                "󰂇",
+                "󰂈",
+                "󰢝",
+                "󰂉",
+                "󰢞",
+                "󰂊",
+                "󰂋",
+                "󰂅"
+            ],
+            "default": [
+                "󰁺",
+                "󰁻",
+                "󰁼",
+                "󰁽",
+                "󰁾",
+                "󰁿",
+                "󰂀",
+                "󰂁",
+                "󰂂",
+                "󰁹"
+            ]
+        },
+        "format-full": "Charged ",
+        "interval": 5,
+        "states": {
+            "warning": 20,
+            "critical": 10
+        },
+        "tooltip": false
+    },
+    "custom/pacman": {
+	"format": "{}  ",
+	"interval": "once",
+	"exec": "pacman_packages",
+	"on-click": "update-system",
+	"signal": 8
+    },
+    "custom/kernel": {
+        "format": "❤ {}",
+	"interval": 3600,
+        "max-length": 20,
+         "exec": "uname -r"
+    },
+    "custom/diskfree": {
+        "format": "🖴 Disk: {} used",
+	"interval": 300,
+        "max-length": 20,
+         "exec": "df --total -hl | grep 'sda1' | awk '{print $5}'"
+    },
+    "custom/power": {
+        "format": "󰤆",
+        "tooltip": false,
+        "on-click": "dm-logout -r &"
+    }
 }
+
