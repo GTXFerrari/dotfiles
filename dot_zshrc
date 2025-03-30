@@ -43,7 +43,6 @@ export TERMINAL='kitty'
 #PATH
 path+=('/home/jake/.local/bin/')
 path+=('/home/jake/.local/bin/scripts/')
-path+=('/home/jake/.local/bin/dwmblocks/')
 export PATH
 
 ## {Alias} ##
