@@ -1,22 +1,23 @@
 sort=-time
 layer=overlay
-background-color=#2e3440
+background-color=#1a1b2680
 width=300
 height=110
 border-size=2
+text-color=#9ece6a
 border-color=#88c0d0
 border-radius=15
-icons=0
+icons=1
 max-icon-size=64
 default-timeout=5000
 ignore-timeout=1
-font=Ubuntu 14
+font='JetBrainsMono Nerd Font' 12
 
 [urgency=low]
-border-color=#cccccc
+border-color=#b4f9f8
 
 [urgency=normal]
-border-color=#d08770
+border-color=#73daca
 
 [urgency=high]
 border-color=#bf616a
