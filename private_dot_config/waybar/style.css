@@ -2,14 +2,14 @@
   border: none;
   border-radius: 0;
   min-height: 0;
-  font-family: Ubuntu;
-  font-size: 16px;
-  font-weight: bold;    
-
+  font-family: JetBrainsMono Nerd Font;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 window#waybar {
-  background-color: #282c34;
+  background-color: #000000;
+  background: transparent;
   transition-property: background-color;
   transition-duration: 0.5s;
 }
@@ -29,16 +29,17 @@ window#waybar.hidden {
   /* Fix weird spacing in materia (waybar #450) */
   box-shadow: inset 0 -3px transparent;
   /* Use box-shadow instead of border so the text isn't offset */
-  padding: 2px 12px;
-  margin: 4px 3px;
+  padding: 6px 18px;
+  margin: 6px 3px;
   border-radius: 4px;
-  background-color: #1e1e2e;
-  color: #cdd6f4;
+  background-color: #1a1b26;
+  color: #b4f9f8;
+  font-weight: inherit;
 }
 
 #workspaces button.active {
   color: #1e1e2e;
-  background-color: #cdd6f4;
+  background-color: #2ac3de;
 }
 
 #workspaces button:hover {
@@ -54,83 +55,47 @@ window#waybar.hidden {
 
 #cpu,
 #memory,
-#custom-kernel,
-#custom-power,
-#custom-diskfree,
-#battery,
 #backlight,
 #wireplumber,
+#bluetooth,
 #network,
 #clock,
 #tray {
   border-radius: 4px;
-  margin: 4px 3px;
-  padding: 2px 12px;
-  background-color: #282c34;
-  color: #282c34;
-}
-#custom-kernel {
-  background-color: #ff6c6b;
+  margin: 6px 3px;
+  padding: 6px 12px;
+  background-color: #24273a;
+  color: #181825;
 }
 
 #custom-power {
   margin-right: 6px;
-  background-color: #f2cdcd;
-}
-
-#custom-diskfree {
-  background-color: #fc9867;
-}
-
-#custom-logo {
-  padding-right: 7px;
-  padding-left: 7px;
-  margin-left: 5px;
-  font-size: 15px;
-  border-radius: 8px 0px 0px 8px;
-  color: #1793d1;
 }
 
 #cpu {
-  background-color: #98be65;
+  background-color: #7dcfff;
 }
-
 
 #memory {
-  background-color: #46d9ff;
-}
-
-#battery {
-  background-color: #f38ba8;
-}
-
-#battery.warning,
-#battery.critical,
-#battery.urgent {
-  background-color: #ff6c6b;
-  color: #f1fa8c;
-}
-
-#battery.charging {
-  background-color: #98be65;
-  color: #181825;
-}
-
-#backlight {
-    background-color: #ff6c6b;
+  background-color: #b4f9f8;
 }
 
 #wireplumber {
-  background-color: #46d9ff;
+  background-color: #f9e2af;
+  padding-right: 16px;
+}
+
+#bluetooth {
+  background-color: #f9e2af;
 }
 
 #network {
-  background-color: #98be65;
-  padding-right: 17px;
+  background-color: #a9b1d6;
 }
 
 #clock {
-  background-color: #cba6f7;
+  font-family: JetBrainsMono Nerd Font;
+  background-color: #cfc9c2;
 }
 
 tooltip {
@@ -143,4 +108,3 @@ tooltip label {
   padding: 5px;
   background-color: #131822;
 }
-
