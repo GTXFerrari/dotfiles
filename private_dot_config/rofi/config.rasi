@@ -1,6 +1,6 @@
 configuration{
     modi: ["drun", "window", "run"];
-    icon-theme: "Papirus-Dark";
+    icon-theme: "Tela-dark";
     show-icons: true;
     terminal: "kitty";
     drun-display-format: "{icon} {name}";
@@ -26,4 +26,4 @@ configuration{
     kb-move-char-forward: "Control+f";
     kb-mode-complete: "Control+o";
 }
-@theme "/usr/share/rofi/themes/tokyonight.rasi"
+@theme "~/.config/rofi/tokyonight.rasi"
