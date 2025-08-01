@@ -123,7 +123,6 @@ alias \
 
 # Python VENV
 alias \
-  gallery-dl='source ~/Code/Python/VENV/gallery-dl/bin/activate && gallery-dl' \ 
   comfy='source ~/Code/Python/VENV/comfyui/bin/activate' \
 
 # Chezmoi
@@ -131,6 +130,15 @@ alias \
   cs='chezmoi status' \
   ccd='chezmoi cd' \
   cm='chezmoi merge' \
+
+# Docker
+alias \
+  dcu='docker compose up -d' \
+  dcd='docker compose down' \
+
+alias \
+  sunon='hyprctl output create headless HEADLESS-2' \
+  sunoff='hyprctl output remove HEADLESS-2' \
 
 # Source Plugins
 source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
