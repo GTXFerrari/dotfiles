@@ -77,8 +77,3 @@ ex=🎯:\
 *.jar=♨:\
 *.java=♨:\
 "
-
-# Autostart Hyprland on TTY(1)
-if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" = 1 ]; then
- exec Hyprland
-fi
