@@ -2,7 +2,7 @@
   border: none;
   border-radius: 0;
   min-height: 0;
-  font-family: JetBrainsMono Nerd Font;
+  font-family: MesloLGS Nerd Font;
   font-size: 14px;
   font-weight: bold;
 }
@@ -55,11 +55,13 @@ window#waybar.hidden {
 
 #cpu,
 #memory,
+#custom-gpu,
 #backlight,
 #wireplumber,
 #bluetooth,
 #network,
 #clock,
+#custom-notification,
 #tray {
   border-radius: 4px;
   margin: 6px 3px;
@@ -80,6 +82,10 @@ window#waybar.hidden {
   background-color: #b4f9f8;
 }
 
+#custom-gpu {
+  background-color: #9ece6a;
+}
+
 #wireplumber {
   background-color: #f9e2af;
   padding-right: 16px;
@@ -94,7 +100,7 @@ window#waybar.hidden {
 }
 
 #clock {
-  font-family: JetBrainsMono Nerd Font;
+  font-family: inherit;
   background-color: #cfc9c2;
 }
 
@@ -107,4 +113,12 @@ tooltip {
 tooltip label {
   padding: 5px;
   background-color: #131822;
+}
+
+#custom-notification {
+  font-family: inherit;
+  font-size: 6px;
+  padding-left: 8px;
+  padding-right: 10px;
+  background-color: #7dcfff;
 }

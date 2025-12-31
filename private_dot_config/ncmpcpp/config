@@ -27,7 +27,7 @@
 #
 ## Needed for tag editor and file operations to work.
 ##
-mpd_music_dir = /mnt/truenas/media/Music/Library/
+mpd_music_dir = "/mnt/truenas/nfs/media/Music/Library"
 #
 #mpd_crossfade_time = 5
 #

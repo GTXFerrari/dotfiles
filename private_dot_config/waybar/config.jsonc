@@ -10,19 +10,21 @@
     "clock"
   ],
   "modules-right": [
-    "custom/easyeffects",
+    // "custom/easyeffects",
     "cpu",
     "memory",
+    "custom/gpu",
     // "network",
     "wireplumber",
     "bluetooth",
+    "custom/notification",
     "tray"
   ],
   "wlr/taskbar": {
     "format": "{icon}",
     "on-click": "activate",
     "on-click-right": "fullscreen",
-    "icon-theme": "Tela-dark",
+    "icon-theme": "Papirus Dark",
     "icon-size": 20,
     "tooltip-format": "{title}"
   },
@@ -31,15 +33,15 @@
     "format": "{icon}",
     "format-icons": {
       "default": "",
-      "1": "[1] ",
-      "2": "[2] ",
-      "3": "[3] ",
-      "4": "[4] ",
-      "5": "[5]",
-      "6": "[6]",
-      "7": "[7] ",
-      "8": "[8] ",
-      "9": "[9] "
+      "1": "1: ",
+      "2": "2: ",
+      "3": "3: ",
+      "4": "4: ",
+      "5": "5: ",
+      "6": "6: ",
+      "7": "7: ",
+      "8": "8: ",
+      "9": "9: "
     },
     "persistent_workspaces": {
       "1": [],
@@ -102,5 +104,32 @@
     "format-connected": " {device_alias}",
     "on-click": "blueman-manager",
     "on-click-middle": "rfkill toggle bluetooth"
-  }
+  },
+  "custom/gpu": {
+    "format": "{icon} {text}",
+    "exec": "gpu-usage-waybar",
+    "return-type": "json",
+    "format-icons": "",
+    "on-click": "kitty -e nvtop",
+  },
+  "custom/notification": {
+    "tooltip": true,
+    "format": "<span size='16pt'>{icon}</span>",
+    "format-icons": {
+      "notification": "󱅫",
+      "none": "󰂜",
+      "dnd-notification": "󰂠",
+      "dnd-none": "󰪓",
+      "inhibited-notification": "󰂛",
+      "inhibited-none": "󰪑",
+      "dnd-inhibited-notification": "󰂛",
+      "dnd-inhibited-none": "󰪑"
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
+  },
 }
