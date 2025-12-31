@@ -28,6 +28,7 @@ export TERMINAL='kitty'
 
 #PATH
 path+=('/home/jake/.local/bin/')
+path+=('/home/jake/.cargo/bin/')
 path+=('/home/jake/.local/bin/scripts/')
 export PATH
 
