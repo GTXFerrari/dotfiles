@@ -1,135 +1,137 @@
+// -*- mode: jsonc -*-
 {
   "layer": "top",
-  "position": "top",
+  "margin-top": 8,
+  "margin-left": 10,
+  "margin-right": 10,
   "spacing": 0,
-  "height": 30,
   "modules-left": [
-    "hyprland/workspaces"
+    "hyprland/workspaces",
+    "custom/updates",
+    "hyprland/window"
   ],
   "modules-center": [
     "clock"
   ],
   "modules-right": [
-    // "custom/easyeffects",
+    "custom/kernel",
     "cpu",
     "memory",
     "custom/gpu",
+    "disk",
     // "network",
     "wireplumber",
     "bluetooth",
-    "custom/notification",
     "tray"
   ],
-  "wlr/taskbar": {
-    "format": "{icon}",
-    "on-click": "activate",
-    "on-click-right": "fullscreen",
-    "icon-theme": "Papirus Dark",
-    "icon-size": 20,
-    "tooltip-format": "{title}"
-  },
   "hyprland/workspaces": {
-    "on-click": "activate",
-    "format": "{icon}",
+    "disable-scroll": true,
+    "all-outputs": true,
+    "warp-on-scroll": false,
+    "format": "{name}: {icon}",
     "format-icons": {
-      "default": "",
-      "1": "1: ",
-      "2": "2: ",
-      "3": "3: ",
-      "4": "4: ",
-      "5": "5: ",
-      "6": "6: ",
-      "7": "7: ",
-      "8": "8: ",
-      "9": "9: "
-    },
-    "persistent_workspaces": {
-      "1": [],
-      "2": [],
-      "3": [],
-      "4": [],
-      "5": [],
-      "6": [],
-      "7": [],
-      "8": [],
-      "9": []
+      "1": " ",
+      "2": " ",
+      "3": " ",
+      "4": " ",
+      "5": " ",
+      "8": " ",
+      "9": " ",
+      "urgent": "",
+      "focused": "",
+      "default": ""
     }
+  },
+  "hyprland/window": {
+    "max-length": 50
+  },
+  "tray": {
+    "icon-size": 20,
+    "spacing": 10
+  },
+  "clock": {
+    "format": "{:%a %I:%M %p}",
+    "timezone": "America/Los_Angeles",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
   },
   "cpu": {
     "interval": 1,
-    "format": "󰍛 {usage}%",
-    "on-click": "kitty -e btop"
+    "format": "{usage}% ",
+    "tooltip": false,
+    "on-click": "kitty --class btop-waybar -e btop"
   },
   "memory": {
-    "interval": 5,
-    "format": " {}%",
-    "max-length": 10
-  },
-  "gpu": {},
-  "tray": {
-    "spacing": 10,
-    "icon-size": 20,
-  },
-  "clock": {
-    "tooltip-format": "{calendar}",
-    "format-alt": "  {:%a, %d %b %Y}",
-    "format": "  {:%I:%M %p}"
-  },
-  "network": {
-    "interface": "br0",
-    "format": " {bandwidthDownBytes} |  {bandwidthUpBytes}",
     "interval": 3,
-    "align": "right",
+    "on-click": "kitty --class btop-waybar -e btop",
+    "format": "{used:0.1f}G/{total:0.1f}G "
+  },
+  "disk": {
+    "interval": 180,
+    "format": "{specific_free:0.2f}TB/{specific_total:0.2f}TB  ",
+    "unit": "TB",
+    "path": "/",
+    "tooltip": false
   },
   "wireplumber": {
-    "format": "{icon}",
-    "format-bluetooth": "󰂰",
-    "nospacing": 1,
-    "tooltip-format": "Volume : {volume}%",
+    "format": "{icon} {volume}%",
     "format-muted": "󰝟",
-    "format-icons": {
-      "headphone": "",
-      "default": [
-        "󰖀",
-        "󰕾",
-        ""
-      ]
-    },
-    "on-click": "pamixer -t",
-    "on-click-middle": "pavucontrol",
-    "scroll-step": 1
+    "format-icons": [
+      "󰕿",
+      "󰖀",
+      "󰕾"
+    ],
+    "max-volume": 100,
+    "on-click": "kitty --class pulsemixer-waybar -e pulsemixer"
   },
   "bluetooth": {
-    "format": " {status}",
-    "format-connected": " {device_alias}",
-    "on-click": "blueman-manager",
-    "on-click-middle": "rfkill toggle bluetooth"
+    "on-click": "kitty --class bluetui-waybar -e bluetui",
+    "on-click-middle": "rfkill toggle bluetooth",
+    "format": "󰂯",
+    "format-disabled": "󰂲",
+    "format-off": "󰂲",
+    "format-connected": "󰂱 {device_alias}",
+    "format-connected-battery": "󰂱 {device_alias} {device_battery_percentage}%",
+    "tooltip-format": "{controller_alias} {controller_address}",
+    "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias} {device_address}"
+  },
+  "custom/kernel": {
+    "exec": "uname -r | cut -d'-' -f1",
+    "interval": 3600,
+    "format": " {}",
+    "tooltip": false
+  },
+  "custom/updates": {
+    "on-click": "kitty --class yay-waybar -e yay",
+    "format": "{} {icon}",
+    "return-type": "json",
+    "format-icons": {
+      "has-updates": "󱍷",
+      "updated": ""
+    },
+    "exec-if": "which waybar-module-pacman-updates",
+    "exec": "waybar-module-pacman-updates --no-zero-output"
+  },
+  "network": {
+    // "interface": "wlp2*", // (Optional) To force the use of this interface
+    "format-wifi": "{essid} ({signalStrength}%) ",
+    "format-ethernet": "{ipaddr} ",
+    "tooltip-format": "{ifname} via {gwaddr} ",
+    "format-linked": "{ifname} (No IP) ",
+    "format-disconnected": "Disconnected ⚠",
+    "format-alt": "{ifname}: {ipaddr}/{cidr}"
   },
   "custom/gpu": {
-    "format": "{icon} {text}",
-    "exec": "gpu-usage-waybar",
-    "return-type": "json",
-    "format-icons": "",
-    "on-click": "kitty -e nvtop",
+    "exec": "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits",
+    "format": "{}%  ",
+    "interval": 1,
+    "tooltip": false,
+    "on-click": "kitty --class nvtop-waybar -e nvtop"
   },
-  "custom/notification": {
-    "tooltip": true,
-    "format": "<span size='16pt'>{icon}</span>",
-    "format-icons": {
-      "notification": "󱅫",
-      "none": "󰂜",
-      "dnd-notification": "󰂠",
-      "dnd-none": "󰪓",
-      "inhibited-notification": "󰂛",
-      "inhibited-none": "󰪑",
-      "dnd-inhibited-notification": "󰂛",
-      "dnd-inhibited-none": "󰪑"
-    },
-    "return-type": "json",
-    "exec-if": "which swaync-client",
-    "exec": "swaync-client -swb",
-    "on-click": "swaync-client -t -sw",
-    "on-click-right": "swaync-client -d -sw",
-    "escape": true
-  },
+  "image": {
+    "path": "$HOME/.config/waybar/images/arch.svg",
+    "size": 22,
+    "tooltip": false,
+    "on-click": "fuzzel"
+  }
 }
