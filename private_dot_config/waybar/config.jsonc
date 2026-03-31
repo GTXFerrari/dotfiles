@@ -1,137 +1,235 @@
 // -*- mode: jsonc -*-
-{
-  "layer": "top",
-  "margin-top": 8,
-  "margin-left": 10,
-  "margin-right": 10,
-  "spacing": 0,
-  "modules-left": [
-    "hyprland/workspaces",
-    "custom/updates",
-    "hyprland/window"
-  ],
-  "modules-center": [
-    "clock"
-  ],
-  "modules-right": [
-    "custom/kernel",
-    "cpu",
-    "memory",
-    "custom/gpu",
-    "disk",
-    // "network",
-    "wireplumber",
-    "bluetooth",
-    "tray"
-  ],
-  "hyprland/workspaces": {
-    "disable-scroll": true,
-    "all-outputs": true,
-    "warp-on-scroll": false,
-    "format": "{name}: {icon}",
-    "format-icons": {
-      "1": " ",
-      "2": " ",
-      "3": " ",
-      "4": " ",
-      "5": " ",
-      "8": " ",
-      "9": " ",
-      "urgent": "",
-      "focused": "",
-      "default": ""
+[
+  {
+    "output": "DP-2",
+    "layer": "top",
+    "margin-top": 8,
+    "margin-left": 10,
+    "margin-right": 10,
+    "spacing": 0,
+    "modules-left": [
+      "hyprland/workspaces",
+      "custom/updates",
+      "hyprland/window"
+    ],
+    "modules-center": [
+      "clock"
+    ],
+    "modules-right": [
+      "custom/kernel",
+      "cpu",
+      "memory",
+      "custom/gpu",
+      "disk",
+      // "network",
+      "wireplumber",
+      "bluetooth",
+      "tray"
+    ],
+    "hyprland/workspaces": {
+      "disable-scroll": true,
+      "all-outputs": true,
+      "warp-on-scroll": false,
+      "format": "{name}: {icon}",
+      "format-icons": {
+        "1": " ",
+        "2": " ",
+        "3": " ",
+        "4": " ",
+        "5": " ",
+        "8": " ",
+        "9": " ",
+        "urgent": "",
+        "focused": "",
+        "default": ""
+      }
+    },
+    "hyprland/window": {
+      "max-length": 50
+    },
+    "tray": {
+      "icon-size": 20,
+      "spacing": 10
+    },
+    "clock": {
+      "format": "{:%a %I:%M %p}",
+      "timezone": "America/Los_Angeles",
+      "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "cpu": {
+      "interval": 1,
+      "format": " {usage}%",
+      "tooltip": false,
+      "on-click": "kitty --class btop-waybar -e btop"
+    },
+    "memory": {
+      "interval": 3,
+      "on-click": "kitty --class btop-waybar -e btop",
+      "format": " {used:0.1f}G/{total:0.1f}G"
+    },
+    "disk": {
+      "interval": 180,
+      "format": " {specific_free:0.2f}TB/{specific_total:0.2f}TB",
+      "unit": "TB",
+      "path": "/",
+      "tooltip": false
+    },
+    "wireplumber": {
+      "format": "{icon} {volume}%",
+      "format-muted": "󰝟",
+      "format-icons": [
+        "󰕿",
+        "󰖀",
+        "󰕾"
+      ],
+      "max-volume": 100,
+      "on-click": "kitty --class pulsemixer-waybar -e pulsemixer"
+    },
+    "bluetooth": {
+      "on-click": "kitty --class bluetui-waybar -e bluetui",
+      "on-click-middle": "rfkill toggle bluetooth",
+      "format": "󰂯",
+      "format-disabled": "󰂲",
+      "format-off": "󰂲",
+      "format-connected": "󰂱 {device_alias}",
+      "format-connected-battery": "󰂱 {device_alias} {device_battery_percentage}%",
+      "tooltip-format": "{controller_alias} {controller_address}",
+      "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
+      "tooltip-format-enumerate-connected": "{device_alias} {device_address}"
+    },
+    "custom/kernel": {
+      "exec": "uname -r | cut -d'-' -f1",
+      "interval": 3600,
+      "format": " {}",
+      "tooltip": false
+    },
+    "custom/updates": {
+      "on-click": "kitty --class yay-waybar -e yay",
+      "format": "{} {icon}",
+      "return-type": "json",
+      "format-icons": {
+        "has-updates": "󱍷",
+        "updated": ""
+      },
+      "exec-if": "which waybar-module-pacman-updates",
+      "exec": "waybar-module-pacman-updates --no-zero-output"
+    },
+    "network": {
+      // "interface": "wlp2*", // (Optional) To force the use of this interface
+      "format-wifi": "{essid} ({signalStrength}%) ",
+      "format-ethernet": "{ipaddr} ",
+      "tooltip-format": "{ifname} via {gwaddr} ",
+      "format-linked": "{ifname} (No IP) ",
+      "format-disconnected": "Disconnected ⚠",
+      "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    },
+    "custom/gpu": {
+      "exec": "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits",
+      "format": " {}%",
+      "interval": 1,
+      "tooltip": false,
+      "on-click": "kitty --class nvtop-waybar -e nvtop"
+    },
+    "image": {
+      "path": "$HOME/.config/waybar/images/arch.svg",
+      "size": 22,
+      "tooltip": false,
+      "on-click": "fuzzel"
     }
   },
-  "hyprland/window": {
-    "max-length": 50
-  },
-  "tray": {
-    "icon-size": 20,
-    "spacing": 10
-  },
-  "clock": {
-    "format": "{:%a %I:%M %p}",
-    "timezone": "America/Los_Angeles",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-  },
-  "cpu": {
-    "interval": 1,
-    "format": "{usage}% ",
-    "tooltip": false,
-    "on-click": "kitty --class btop-waybar -e btop"
-  },
-  "memory": {
-    "interval": 3,
-    "on-click": "kitty --class btop-waybar -e btop",
-    "format": "{used:0.1f}G/{total:0.1f}G "
-  },
-  "disk": {
-    "interval": 180,
-    "format": "{specific_free:0.2f}TB/{specific_total:0.2f}TB  ",
-    "unit": "TB",
-    "path": "/",
-    "tooltip": false
-  },
-  "wireplumber": {
-    "format": "{icon} {volume}%",
-    "format-muted": "󰝟",
-    "format-icons": [
-      "󰕿",
-      "󰖀",
-      "󰕾"
+  // ── Minimal bar — iPad Pro ───────────────────────────────────
+  {
+    "output": "HEADLESS-2",
+    "layer": "top",
+    "margin-top": 8,
+    "margin-left": 10,
+    "margin-right": 10,
+    "spacing": 0,
+    "modules-left": [
+      "hyprland/workspaces",
+      "custom/updates"
     ],
-    "max-volume": 100,
-    "on-click": "kitty --class pulsemixer-waybar -e pulsemixer"
-  },
-  "bluetooth": {
-    "on-click": "kitty --class bluetui-waybar -e bluetui",
-    "on-click-middle": "rfkill toggle bluetooth",
-    "format": "󰂯",
-    "format-disabled": "󰂲",
-    "format-off": "󰂲",
-    "format-connected": "󰂱 {device_alias}",
-    "format-connected-battery": "󰂱 {device_alias} {device_battery_percentage}%",
-    "tooltip-format": "{controller_alias} {controller_address}",
-    "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
-    "tooltip-format-enumerate-connected": "{device_alias} {device_address}"
-  },
-  "custom/kernel": {
-    "exec": "uname -r | cut -d'-' -f1",
-    "interval": 3600,
-    "format": " {}",
-    "tooltip": false
-  },
-  "custom/updates": {
-    "on-click": "kitty --class yay-waybar -e yay",
-    "format": "{} {icon}",
-    "return-type": "json",
-    "format-icons": {
-      "has-updates": "󱍷",
-      "updated": ""
+    "modules-center": [
+      "clock"
+    ],
+    "modules-right": [
+      "cpu",
+      "memory",
+      "wireplumber",
+      "bluetooth",
+      "tray"
+    ],
+    "hyprland/workspaces": {
+      "disable-scroll": true,
+      "all-outputs": true,
+      "warp-on-scroll": false,
+      "format": "{name}: {icon}",
+      "format-icons": {
+        "1": " ",
+        "2": " ",
+        "3": " ",
+        "4": " ",
+        "5": " ",
+        "8": " ",
+        "9": " ",
+        "urgent": "",
+        "focused": "",
+        "default": ""
+      }
     },
-    "exec-if": "which waybar-module-pacman-updates",
-    "exec": "waybar-module-pacman-updates --no-zero-output"
-  },
-  "network": {
-    // "interface": "wlp2*", // (Optional) To force the use of this interface
-    "format-wifi": "{essid} ({signalStrength}%) ",
-    "format-ethernet": "{ipaddr} ",
-    "tooltip-format": "{ifname} via {gwaddr} ",
-    "format-linked": "{ifname} (No IP) ",
-    "format-disconnected": "Disconnected ⚠",
-    "format-alt": "{ifname}: {ipaddr}/{cidr}"
-  },
-  "custom/gpu": {
-    "exec": "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits",
-    "format": "{}%  ",
-    "interval": 1,
-    "tooltip": false,
-    "on-click": "kitty --class nvtop-waybar -e nvtop"
-  },
-  "image": {
-    "path": "$HOME/.config/waybar/images/arch.svg",
-    "size": 22,
-    "tooltip": false,
-    "on-click": "fuzzel"
+    "clock": {
+      "format": "{:%I:%M %p}",
+      "timezone": "America/Los_Angeles",
+      "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "wireplumber": {
+      "format": "{icon} {volume}%",
+      "format-muted": "󰝟",
+      "format-icons": [
+        "󰕿",
+        "󰖀",
+        "󰕾"
+      ],
+      "max-volume": 100,
+      "on-click": "kitty --class pulsemixer-waybar -e pulsemixer"
+    },
+    "tray": {
+      "icon-size": 20,
+      "spacing": 10
+    },
+    "custom/updates": {
+      "on-click": "kitty --class yay-waybar -e yay",
+      "format": "{} {icon}",
+      "return-type": "json",
+      "format-icons": {
+        "has-updates": "󱍷",
+        "updated": ""
+      },
+      "exec-if": "which waybar-module-pacman-updates",
+      "exec": "waybar-module-pacman-updates --no-zero-output"
+    },
+    "bluetooth": {
+      "on-click": "kitty --class bluetui-waybar -e bluetui",
+      "on-click-middle": "rfkill toggle bluetooth",
+      "format": "󰂯",
+      "format-disabled": "󰂲",
+      "format-off": "󰂲",
+      "format-connected": "󰂱 {device_alias}",
+      "format-connected-battery": "󰂱 {device_alias} {device_battery_percentage}%",
+      "tooltip-format": "{controller_alias} {controller_address}",
+      "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
+      "tooltip-format-enumerate-connected": "{device_alias} {device_address}"
+    },
+    "cpu": {
+      "interval": 1,
+      "format": " {usage}%",
+      "tooltip": false,
+      "on-click": "kitty --class btop-waybar -e btop"
+    },
+    "memory": {
+      "interval": 3,
+      "on-click": "kitty --class btop-waybar -e btop",
+      "format": " {}%"
+    }
   }
 }
