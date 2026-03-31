@@ -125,7 +125,7 @@
     },
     "custom/gpu": {
       "exec": "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits",
-      "format": " {}%",
+      "format": "  {}%",
       "interval": 1,
       "tooltip": false,
       "on-click": "kitty --class nvtop-waybar -e nvtop"
