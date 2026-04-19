@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+font_list() {
+  query_user=$(gum choose "List Font Families" "List Font Styles" "List Term Fonts (Monospaced)" "Search All Fonts")
+  case $query_user in
+  "List Font Families")
+    fc-list : family | sed 's/,.*//' | sort -u | gum filter
+    ;;
+  "List Font Styles")
+    fc-list : family style | sort | gum filter
+    ;;
+  "List Term Fonts (Monospaced)")
+    fc-list : family spacing=100 | sed 's/,.*//' | sort -u | gum filter
+    ;;
+  "Search All Fonts")
+    font_name=$(gum input)
+    fc-list | grep -i $font_name | gum filter
+    ;;
+  esac
+
+}
+
+font_list
