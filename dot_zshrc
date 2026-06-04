@@ -20,9 +20,11 @@ zstyle ':completions:*' menu select
 zmodload zsh/complist
 compinit
 _comp_options+=(globdots) # Include hidden files
+autoload -U +X bashcompinit && bashcompinit
+source ~/.config/govc/completion.sh
 
 # Environment Variables
-export BROWSER='firefox'
+export BROWSER='zen-browser'
 export EDITOR='nvim'
 export TERMINAL='kitty'
 
@@ -104,7 +106,10 @@ alias \
   hbcli='HandBrakeCLI' \
   s='kitten ssh' \
   nano='nvim' \
-  vim='nvim'
+  vim='nvim' \
+  tf='terraform'
+  
+
 
 # Easyeffects
 alias \
@@ -130,6 +135,12 @@ alias \
   sunon='hyprctl output create headless HEADLESS-2' \
   sunoff='hyprctl output remove HEADLESS-2' \
 
+# SSH Hypr Session
+alias grab-session='
+  export $(systemctl --user show-environment | xargs)
+  export HYPRLAND_INSTANCE_SIGNATURE=$(ls /run/user/1000/hypr/ | tail -1)
+'
+
 # Yazi
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
@@ -138,6 +149,10 @@ function y() {
 	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
 	rm -f -- "$tmp"
 }
+
+# Govc
+govc-vcenter() { set -a; source ~/.config/govc/vcenter.env; set +a; }
+govc-esxi() { set -a; source ~/.config/govc/esxi.env; set +a; }
 
 # Source Plugins
 source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
