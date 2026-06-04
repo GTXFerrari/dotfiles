@@ -10,13 +10,14 @@
 
 hl.config({
 	decoration = {
-		rounding = 10,
+		rounding = 20,
+		rounding_power = 5,
 		active_opacity = 1.0,
 		inactive_opacity = 1.0,
 		blur = {
 			enabled = true,
-			size = 8,
-			passes = 4,
+			size = 2,
+			passes = 5,
 			noise = 0.02,
 			contrast = 1,
 			brightness = 1,
@@ -24,13 +25,10 @@ hl.config({
 			vibrancy = 0.1696,
 			special = true,
 		},
-		-- glow = { enabled = true,
-		-- 	range = 10,
-		-- 	render_power = 4,
+		-- glow = { enabled = true, range = 4, render_power = 4 },
+		-- shadow = {
+		-- 	enabled = true,
+		-- 	range = 4,
 		-- },
-		shadow = {
-			enabled = true,
-			range = 4,
-		},
 	},
 })
