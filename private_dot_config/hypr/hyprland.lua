@@ -9,7 +9,6 @@
 --]]
 
 require("config/env")
-local theme = require("config/theme")
 require("config/monitors")
 require("config/input")
 require("config/animations")
@@ -18,6 +17,8 @@ require("config/rules")
 require("config/keybinds")
 require("config/layout")
 require("config/autostart")
+require("config/bitwarden_web_fix").setup()
+require("scripts/cycle_layouts")
 
--- Themes
-theme.apply("gruvbox")
+-- This loads Noctalia-generated Hyprland colors.
+dofile("/home/jake/.config/hypr/noctalia/noctalia-colors.lua")
