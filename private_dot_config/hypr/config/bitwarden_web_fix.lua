@@ -1,11 +1,12 @@
 local M = {}
 
 local registered = false
-local title_prefix = "(Bitwarden"
-local title_suffix = "Password Manager) - Bitwarden"
+local title_fragment = "(Bitwarden Password Manager) - Bitwarden"
+local firefox_startup_title = "Mozilla Firefox"
 local popup_width = 420
 local popup_height = 520
-local pending_timers = {}
+local pending_firefox = {}
+local fixed_windows = {}
 local debug = false
 local log_path = "/tmp/bitwarden_web_fix.log"
 
@@ -21,78 +22,95 @@ local function log(message)
   end
 end
 
-local function window_address(window)
-  if window == nil or window.address == nil then
-    return nil
-  end
-
-  local address = tostring(window.address)
-  address = address:match("^%s*(.-)%s*$")
-  address = address:gsub("^0[xX]", "")
-
-  if address:match("^[%x]+$") then
-    return "0x" .. address
-  end
-
-  return nil
-end
-
-local function target_size(window)
-  return popup_width, popup_height
-end
-
 local function is_bitwarden_password_manager(title)
-  if type(title) ~= "string" then
+  return type(title) == "string" and title:find(title_fragment, 1, true) ~= nil
+end
+
+local function is_bitwarden_window(window)
+  if window == nil then
     return false
   end
 
-  local prefix_at = title:find(title_prefix, 1, true)
-  local suffix_at = title:find(title_suffix, 1, true)
-
-  return prefix_at ~= nil and suffix_at ~= nil and prefix_at < suffix_at
+  -- Chromium assigns extension popups their own class, including the profile name.
+  return (type(window.class) == "string"
+      and window.class:match("^chrome%-nngceckbapebfimnlniiiahkandclblb%-.+$") ~= nil)
+    or (window.class == "firefox" and is_bitwarden_password_manager(window.title))
 end
 
-local function apply_fix(selector, width, height)
-  log("applying " .. selector .. " size=" .. width .. "x" .. height)
-  hl.dispatch(hl.dsp.window.float({ action = "set", window = selector }))
-  hl.dispatch(hl.dsp.window.resize({ x = width, y = height, window = selector }))
-  hl.dispatch(hl.dsp.window.center({ window = selector }))
-end
-
-local function schedule_fix(selector, width, height)
-  local timer
-
-  timer = hl.timer(function()
-    pending_timers[timer] = nil
-    apply_fix(selector, width, height)
-  end, { timeout = 100, type = "oneshot" })
-
-  pending_timers[timer] = true
+local function apply_fix(window)
+  log("applying " .. tostring(window) .. " size=" .. popup_width .. "x" .. popup_height)
+  hl.dispatch(hl.dsp.window.float({ action = "enable", window = window }))
+  hl.dispatch(hl.dsp.window.resize({ x = popup_width, y = popup_height, window = window }))
+  hl.dispatch(hl.dsp.window.center({ window = window }))
 end
 
 local function fix_window(window)
-  local address = window_address(window)
-  if not address then
-    log("fix skipped: missing address")
+  if window == nil or not window.mapped or not is_bitwarden_window(window) then
     return
   end
 
-  local width, height = target_size(window)
-  if not width then
-    log("fix skipped: missing monitor for " .. address)
+  local window_id = window.stable_id
+  if window_id == nil or fixed_windows[window_id] then
     return
   end
 
-  local selector = "address:" .. address
-  log("scheduling " .. selector .. " title=" .. tostring(window.title) .. " size=" .. width .. "x" .. height)
-  schedule_fix(selector, width, height)
+  apply_fix(window)
+  fixed_windows[window_id] = true
+end
+
+local function is_firefox_loading_title(title)
+  return title == "" or title == firefox_startup_title or title == "about:blank"
+    or (type(title) == "string" and title:match("^about:.*Mozilla Firefox$") ~= nil)
+end
+
+local function finish_firefox_startup(window, force)
+  local window_id = window and window.stable_id
+  if window_id == nil or not pending_firefox[window_id] then
+    return
+  end
+
+  if window.mapped and window.class == "firefox" then
+    if is_bitwarden_window(window) then
+      fix_window(window)
+    elseif not force and is_firefox_loading_title(window.title) then
+      return
+    else
+      -- Ordinary Firefox windows go back to the tiled layout once identified.
+      hl.dispatch(hl.dsp.window.float({ action = "disable", window = window }))
+    end
+  end
+
+  pending_firefox[window_id] = nil
+end
+
+local function begin_firefox_startup(window)
+  if window == nil or not window.mapped or window.class ~= "firefox"
+      or window.initial_title ~= firefox_startup_title then
+    return
+  end
+
+  local window_id = window.stable_id
+  if window_id == nil or pending_firefox[window_id] or fixed_windows[window_id] then
+    return
+  end
+
+  local state = {}
+  pending_firefox[window_id] = state
+  state.timer = hl.timer(function()
+    -- A close/remap may have replaced this startup state.
+    if pending_firefox[window_id] == state then
+      finish_firefox_startup(window, true)
+    end
+  end, { timeout = 500, type = "oneshot" })
 end
 
 local function fix_matching_windows()
   log("sweeping existing windows")
   for _, window in ipairs(hl.get_windows()) do
-    if is_bitwarden_password_manager(window.title) then
+    if is_bitwarden_window(window) then
       fix_window(window)
+    elseif window.class == "firefox" and is_firefox_loading_title(window.title) then
+      begin_firefox_startup(window)
     end
   end
 end
@@ -105,34 +123,73 @@ function M.setup()
   registered = true
   log("setup")
 
+  -- Firefox maps extension popouts with a generic title before naming them.
+  -- Place that startup window before layout insertion to avoid a tiled flash.
+  hl.window_rule({
+    name = "Firefox startup for Bitwarden detection",
+    float = true,
+    size = popup_width .. " " .. popup_height,
+    center = true,
+    no_anim = true,
+    match = {
+      class = "^firefox$",
+      title = "^Mozilla Firefox$",
+    },
+  })
+
   hl.window_rule({
     name = "Bitwarden browser extension popup",
     float = true,
     size = popup_width .. " " .. popup_height,
     center = true,
+    no_anim = true,
     match = {
-      class = "^(zen|firefox)$",
+      class = "^firefox$",
       title = [[.*\(Bitwarden Password Manager\) - Bitwarden.*]],
     },
   })
 
+  hl.window_rule({
+    name = "Bitwarden Chromium extension popup",
+    float = true,
+    size = popup_width .. " " .. popup_height,
+    center = true,
+    match = {
+      class = "^chrome-nngceckbapebfimnlniiiahkandclblb-.+$",
+    },
+  })
+
+  hl.on("window.open_early", begin_firefox_startup)
+
   hl.on("window.open", function(window)
-    if window ~= nil and (window.class == "zen" or window.class == "firefox") then
+    if window ~= nil and window.class == "firefox" then
       log("window.open class=" .. tostring(window.class) .. " title=" .. tostring(window.title))
     end
 
-    if window ~= nil and is_bitwarden_password_manager(window.title) then
+    begin_firefox_startup(window)
+    finish_firefox_startup(window, false)
+    if is_bitwarden_window(window) then
       fix_window(window)
     end
   end)
 
   hl.on("window.title", function(window)
-    if window ~= nil and (window.class == "zen" or window.class == "firefox") then
+    if window ~= nil and window.class == "firefox" then
       log("window.title class=" .. tostring(window.class) .. " title=" .. tostring(window.title))
     end
 
-    if window ~= nil and is_bitwarden_password_manager(window.title) then
+    finish_firefox_startup(window, false)
+    if is_bitwarden_window(window) then
       fix_window(window)
+    end
+  end)
+
+  hl.on("window.close", function(window)
+    local window_id = window and window.stable_id
+    if window_id then
+      -- Let invalidated oneshot timers expire so Hyprland releases their callbacks.
+      pending_firefox[window_id] = nil
+      fixed_windows[window_id] = nil
     end
   end)
 
