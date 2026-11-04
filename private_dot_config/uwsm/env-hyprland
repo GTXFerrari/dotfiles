@@ -1,0 +1,2 @@
+# Hyprland-specific cursor setting
+export HYPRCURSOR_SIZE=24

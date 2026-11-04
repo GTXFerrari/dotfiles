@@ -1,0 +1,25 @@
+# Toolkit selection
+export GDK_BACKEND='wayland,x11,*'
+export QT_QPA_PLATFORM='wayland;xcb'
+export SDL_VIDEODRIVER=wayland
+export CLUTTER_BACKEND=wayland
+
+# Menus, cursor and theme
+export XDG_MENU_PREFIX=arch-
+export XCURSOR_SIZE=24
+export QT_QPA_PLATFORMTHEME=qt6ct
+
+# Existing SSH agent socket setting
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+
+# Existing NVIDIA settings
+export GBM_BACKEND=nvidia-drm
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+export LIBVA_DRIVER_NAME=nvidia
+export __GL_GSYNC_ALLOWED=1
+export __GL_VRR_ALLOWED=1
+
+# UWSM provides XDG_CURRENT_DESKTOP, XDG_SESSION_TYPE and XDG_SESSION_DESKTOP.
+
+# Prefer native Wayland for older Electron applications.
+export ELECTRON_OZONE_PLATFORM_HINT=wayland
