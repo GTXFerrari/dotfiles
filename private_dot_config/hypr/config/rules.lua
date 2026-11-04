@@ -8,10 +8,8 @@
                                                                                                
 --]]
 
--- Window Rules
-
+-- (Window Rules)
 local suppressMaximizeRule = hl.window_rule({
-	-- Ignore maximize requests from all apps. You'll probably like this.
 	name = "suppress-maximize-events",
 	match = { class = ".*" },
 
@@ -19,8 +17,7 @@ local suppressMaximizeRule = hl.window_rule({
 })
 suppressMaximizeRule:set_enabled(true)
 
-hl.window_rule({
-	-- Fix some dragging issues with XWayland
+local fixWaylandDrag = hl.window_rule({
 	name = "fix-xwayland-drags",
 	match = {
 		class = "^$",
@@ -30,72 +27,38 @@ hl.window_rule({
 		fullscreen = false,
 		pin = false,
 	},
-
 	no_focus = true,
 })
+fixWaylandDrag:set_enabled(true)
 
 hl.window_rule({
-	name = "chatgpt-pwa-pin",
-	workspace = "special:codex silent",
+	name = "tui filemanager",
+	float = true,
+	center = true,
+	opacity = 0.8,
+	animation = "popin",
+	size = {
+		"(monitor_w*0.75)",
+		"(monitor_h*0.75)",
+	},
 	match = {
-		class = "FFPWA-01KP4V3YWRRT6NCRRWKP774QP3",
-		initial_title = "ChatGPT",
+		class = "lf-kitty",
 	},
 })
 
 hl.window_rule({
-	name = "WineTricks(float)",
+	name = "GOverlay preview (float and center)",
 	float = true,
+	center = true,
 	match = {
-		class = "zenity",
-		title = "WineTricks",
-	},
-
-	hl.window_rule({
-		name = "tui filemanager",
-		float = true,
-		center = true,
-		opacity = 0.8,
-		animation = "popin",
-		size = {
-			"(monitor_w*0.75)",
-			"(monitor_h*0.75)",
-		},
-		match = {
-			class = "lf-kitty",
-		},
-	}),
-})
-
-hl.window_rule({
-	name = "Xarchiver(float)",
-	float = true,
-	match = {
-		class = "xarchiver",
-	},
-})
-
-hl.window_rule({
-	name = "Steam Settings (float)",
-	float = true,
-	match = {
-		class = "steam",
-		title = "Steam Settings",
-	},
-})
-
-hl.window_rule({
-	name = "Steam Friends List (float)",
-	float = true,
-	match = {
-		class = "steam",
-		title = "Friends List",
+		initial_class = "^pascube$",
 	},
 })
 
 hl.window_rule({
 	name = "OpenRGB(float)",
 	float = true,
+	center = true,
 	match = {
 		class = "org.openrgb.OpenRGB",
 		title = "OpenRGB",
@@ -111,7 +74,6 @@ hl.window_rule({
 	},
 })
 
---TODO: Needs testing
 hl.window_rule({
 	name = "Discord (Pin to workspace 8)",
 	workspace = "8 silent",
@@ -121,7 +83,7 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	name = "Steam (Pin to workspace 9)",
+	name = "Steam (Pin to game workspace)",
 	workspace = "9 silent",
 	match = {
 		class = "^(steam)$",
@@ -129,8 +91,17 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	name = "OBS (Pin to obs workspace)",
-	workspace = "special:obs",
+	name = "Prism Launcher console (float)",
+	float = true,
+	match = {
+		class = [[org\.prismlauncher\.PrismLauncher]],
+		title = "Console window for .*",
+	},
+})
+
+hl.window_rule({
+	name = "OBS (Workspace 10, silent)",
+	workspace = "10 silent",
 	match = {
 		class = "^(com.obsproject.Studio)$",
 	},
@@ -330,15 +301,6 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	name = "firefox pin",
-	workspace = "special:firefox silent",
-	match = {
-		class = "firefox",
-		title = "Mozilla Firefox",
-	},
-})
-
-hl.window_rule({
 	name = "qt6ct",
 	float = true,
 	center = true,
@@ -364,17 +326,14 @@ hl.window_rule({
 	},
 })
 
--- Smart gaps
--- hl.workspace_rule({ workspace = "w[tv1]", gaps_out = 0, gaps_in = 0 })
--- hl.workspace_rule({ workspace = "f[1]", gaps_out = 0, gaps_in = 0 })
--- hl.window_rule({ match = { float = false, workspace = "w[tv1]" }, border_size = 0 })
--- hl.window_rule({ match = { float = false, workspace = "w[tv1]" }, rounding = 0 })
--- hl.window_rule({ match = { float = false, workspace = "f[1]" }, border_size = 0 })
--- hl.window_rule({ match = { float = false, workspace = "f[1]" }, rounding = 0 })
+hl.window_rule({
+	match = {
+		class = "^(steam)$",
+		title = "^(notificationtoasts_.*_desktop)$",
+	},
+	rounding = 0,
+})
 
-hl.workspace_rule({ workspace = "10", layout = "scrolling" })
-
--- Steam Games
 hl.window_rule({
 	name = "FIFA 22",
 	float = true,
@@ -385,11 +344,67 @@ hl.window_rule({
 	},
 })
 
+hl.window_rule({
+	name = "Noctalia Settings",
+	float = true,
+	center = true,
+	match = {
+		class = "dev.noctalia.Noctalia",
+		title = "Noctalia Settings",
+	},
+	size = {
+		"(monitor_w*0.75)",
+		"(monitor_h*0.75)",
+	},
+})
+
+hl.window_rule({
+	match = {
+		class = "^pcsx2-qt$",
+		title = "negative:^PCSX2 v[0-9].*",
+	},
+	float = true,
+	center = true,
+})
+
+hl.window_rule({
+	match = {
+		class = "firefox",
+		title = "Library",
+	},
+	size = {
+		"(monitor_w*0.75)",
+		"(monitor_h*0.75)",
+	},
+	float = true,
+	center = true,
+})
+
+hl.window_rule({
+	match = {
+		class = "",
+		title = "",
+	},
+})
+
+-- Smart gaps
+hl.workspace_rule({ workspace = "w[tv1]", gaps_out = 0, gaps_in = 0 })
+hl.workspace_rule({ workspace = "f[1]", gaps_out = 0, gaps_in = 0 })
+hl.window_rule({ match = { float = false, workspace = "w[tv1]" }, border_size = 0 })
+hl.window_rule({ match = { float = false, workspace = "w[tv1]" }, rounding = 0 })
+hl.window_rule({ match = { float = false, workspace = "f[1]" }, border_size = 0 })
+hl.window_rule({ match = { float = false, workspace = "f[1]" }, rounding = 0 })
+
+-- Scrolling test workspace: Niri's 10px gaps, including for a single column.
+-- Keep these after smart gaps so a lone half-width window keeps its decoration.
+hl.workspace_rule({ workspace = "10", layout = "scrolling", gaps_out = 10, gaps_in = 5 })
+hl.window_rule({ match = { float = false, workspace = "10" }, border_size = 2, rounding = 15 })
+
 -- Layer Rules
 hl.layer_rule({
-	name = "Noctalia-shell blur",
+	name = "noctalia",
 	match = {
-		namespace = "noctalia-background-.*$",
+		namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd)$",
 	},
 	ignore_alpha = 0.5,
 	blur = true,
