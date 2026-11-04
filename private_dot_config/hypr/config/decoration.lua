@@ -10,25 +10,27 @@
 
 hl.config({
 	decoration = {
-		rounding = 20,
-		rounding_power = 5,
+		rounding = 15,
+		rounding_power = 10,
 		active_opacity = 1.0,
 		inactive_opacity = 1.0,
 		blur = {
 			enabled = true,
-			size = 2,
-			passes = 5,
-			noise = 0.02,
+			size = 4,
+			passes = 3,
 			contrast = 1,
-			brightness = 1,
-			new_optimizations = true,
 			vibrancy = 0.1696,
 			special = true,
 		},
-		-- glow = { enabled = true, range = 4, render_power = 4 },
-		-- shadow = {
-		-- 	enabled = true,
-		-- 	range = 4,
-		-- },
+		shadow = {
+			enabled = true,
+			range = 4,
+			render_power = 3,
+			color = 0xee1a1a,
+		},
+	},
+	misc = {
+		disable_hyprland_logo = true,
+		force_default_wallpaper = false,
 	},
 })
