@@ -16,12 +16,26 @@ hl.config({
 		follow_mouse = 1,
 		sensitivity = 0,
 		accel_profile = "flat",
-		-- natural_scroll = true,
-		-- kb_options = "caps:swapescape",
 	},
 	cursor = {
 		inactive_timeout = 3,
 	},
 })
 
---TODO: TouchDevice, Table,
+-- Sunshine / Moonlight relative mouse
+hl.device({
+	name = "libvirtualhid-mouse",
+	sensitivity = 0.0,
+	accel_profile = "flat",
+	scroll_factor = 0.5,
+	natural_scroll = false,
+})
+
+-- Sunshine / Moonlight absolute mouse
+hl.device({
+	name = "libvirtualhid-mouse-(absolute)",
+	sensitivity = 0.0,
+	accel_profile = "flat",
+	scroll_factor = 0.5,
+	natural_scroll = false,
+})
