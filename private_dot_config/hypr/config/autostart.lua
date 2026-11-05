@@ -9,6 +9,7 @@
 --]]
 
 hl.on("hyprland.start", function()
+	hl.exec_cmd("hyprpm reload")
 	hl.exec_cmd("uwsm app -- /home/jake/.config/hypr/scripts/wvkbd.sh start")
 	hl.exec_cmd("uwsm app -- noctalia")
 	hl.exec_cmd("uwsm app -- firefox", {
