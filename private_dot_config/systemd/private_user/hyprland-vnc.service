@@ -1,0 +1,24 @@
+[Unit]
+Description=Separate Hyprland desktop for SSH-tunneled VNC
+
+[Service]
+Type=exec
+Environment=XDG_SESSION_TYPE=wayland
+Environment=XDG_CURRENT_DESKTOP=Hyprland
+Environment=LIBSEAT_BACKEND=seatd
+Environment=SEATD_SOCK=/run/hyprland-vnc-seatd/seatd.sock
+Environment=AQ_DRM_DEVICES=/run/hyprland-vnc-seatd/vkms-card
+Environment=AQ_NO_MODIFIERS=1
+Environment=LIBGL_ALWAYS_SOFTWARE=1
+Environment=GALLIUM_DRIVER=llvmpipe
+Environment=GBM_BACKEND=dri
+Environment=__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
+Environment=__GLX_VENDOR_LIBRARY_NAME=mesa
+UnsetEnvironment=DISPLAY WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE
+ExecStartPre=/usr/bin/test -c /run/hyprland-vnc-seatd/vkms-card
+ExecStart=/usr/bin/dbus-run-session /usr/bin/Hyprland --config %h/.local/share/hyprland-vnc/hyprland.lua
+KillMode=control-group
+TimeoutStopSec=15
+
+[Install]
+WantedBy=default.target

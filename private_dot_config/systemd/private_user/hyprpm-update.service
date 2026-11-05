@@ -1,0 +1,9 @@
+[Unit]
+Description=Update Hyprland plugins with hyprpm
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hyprpm update
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=20min

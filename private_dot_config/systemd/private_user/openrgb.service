@@ -1,0 +1,19 @@
+[Unit]
+Description=OpenRGB lighting server
+Documentation=https://openrgb.org/
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=exec
+ExecStart=%h/AI/Workspaces/openrgb-halloween/OpenRGB/openrgb --server --server-host 127.0.0.1 --noautoconnect --profile "Christmas Breathing"
+ExecStartPost=%h/AI/Workspaces/openrgb-halloween/wait-openrgb.sh
+TimeoutStartSec=45
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGTERM
+TimeoutStopSec=20
+Slice=app-graphical.slice
+
+[Install]
+WantedBy=graphical-session.target

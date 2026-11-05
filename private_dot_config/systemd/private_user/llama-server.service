@@ -1,0 +1,32 @@
+[Unit]
+Description=llama.cpp router server
+Documentation=https://github.com/ggml-org/llama.cpp
+RequiresMountsFor=/mnt/data/AI/llm/models
+
+[Service]
+Type=simple
+WorkingDirectory=%h
+CacheDirectory=llama-server
+Environment=LLAMA_CACHE=%h/.cache/llama-server
+EnvironmentFile=%h/.config/llama-server/env
+ExecStart=/usr/bin/llama-server \
+  --host 0.0.0.0 \
+  --port 9931 \
+  --tools all \
+  --models-dir /mnt/data/AI/llm/models \
+  --models-preset %h/.config/llama-server/models.ini \
+  --models-max 1 \
+  --models-autoload \
+  --batch-size 2048 \
+  --ubatch-size 512 \
+  --parallel 1 \
+  --threads 8 \
+  --threads-batch 8 \
+  --sleep-idle-seconds 300 \
+  --metrics
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

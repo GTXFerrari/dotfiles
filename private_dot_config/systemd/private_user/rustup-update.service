@@ -1,0 +1,6 @@
+[Unit]
+Description=Update stable Rust toolchain
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/rustup update stable --no-self-update

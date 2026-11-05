@@ -1,0 +1,12 @@
+[Unit]
+Description=OpenRGB control window
+PartOf=graphical-session.target openrgb.service
+Requires=openrgb.service
+After=graphical-session.target openrgb.service
+
+[Service]
+Type=exec
+ExecStart=%h/AI/Workspaces/openrgb-halloween/OpenRGB/openrgb --nodetect --gui
+KillSignal=SIGTERM
+TimeoutStopSec=20
+Slice=app-graphical.slice
