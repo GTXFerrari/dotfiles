@@ -21,10 +21,9 @@ zmodload zsh/complist
 compinit
 _comp_options+=(globdots) # Include hidden files
 autoload -U +X bashcompinit && bashcompinit
-source ~/.config/govc/completion.sh
 
 # Environment Variables
-export BROWSER='zen-browser'
+export BROWSER='firefox'
 export EDITOR='nvim'
 export TERMINAL='kitty'
 
@@ -135,20 +134,13 @@ alias \
   sunon='hyprctl output create headless HEADLESS-2' \
   sunoff='hyprctl output remove HEADLESS-2' \
 
+alias noctalia-start='hyprctl dispatch '\''hl.dsp.exec_cmd("noctalia --daemon")'\'''
+
 # SSH Hypr Session
 alias grab-session='
   export $(systemctl --user show-environment | xargs)
   export HYPRLAND_INSTANCE_SIGNATURE=$(ls /run/user/1000/hypr/ | tail -1)
 '
-
-# Yazi
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	command yazi "$@" --cwd-file="$tmp"
-	IFS= read -r -d '' cwd < "$tmp"
-	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
-	rm -f -- "$tmp"
-}
 
 # Govc
 govc-vcenter() { set -a; source ~/.config/govc/vcenter.env; set +a; }
@@ -160,3 +152,6 @@ source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
+
+# Added by cua-driver-rs installer — see https://github.com/trycua/cua
+export PATH="/home/jake/.local/bin:$PATH"
