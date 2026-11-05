@@ -1,25 +1,153 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-draw() {
-  kitty +kitten icat --silent --stdin no --transfer-mode file --place "${w}x${h}@${x}x${y}" "$1" </dev/null >/dev/tty
-  exit 1
-}
-
-file="$1"
+file="$(readlink -f -- "$1")"
 w="$2"
 h="$3"
 x="$4"
 y="$5"
+mode="${6:-preview}"
 
-case "$(file -Lb --mime-type "$file")" in
-image/*)
+# Use mpv for video and animated GIF/WebM previews. Keep Kitty's existing
+# static image previews as a fallback when live output is unavailable.
+play_live() {
+  [ "$mode" = preload ] && exit 1
+  [ -n "${KITTY_WINDOW_ID:-}" ] && [ -z "${TMUX:-}${STY:-}${SSH_CONNECTION:-}${SSH_TTY:-}" ] || return 1
+  "$(dirname -- "$0")/mpv-preview" start "$file" "$w" "$h" "$x" "$y" || return 1
+  exit 1
+}
+
+draw() {
+  # Preloading may populate the disk cache, but must never draw on the screen.
+  [ "$mode" = preload ] && exit 1
+
+  local place="${w}x${h}@${x}x${y}"
+  local -a size_options=()
+  if [ "${2:-}" = animation ]; then
+    # Center a box covering 90% of the pane's width and height. Let Kitty
+    # enlarge small animations to fit it while preserving their proportions.
+    local pw=$((w * 90 / 100)) ph=$((h * 90 / 100))
+    [ "$pw" -lt 1 ] && pw=1
+    [ "$ph" -lt 1 ] && ph=1
+    place="${pw}x${ph}@$((x + (w - pw) / 2))x$((y + (h - ph) / 2))"
+    size_options=(--scale-up)
+  fi
+
+  # Shared memory avoids streaming every decoded animation frame through the
+  # terminal. Remote Kitty sessions need the stream transport instead.
+  transfer=memory
+  [ -n "${SSH_CONNECTION:-}${SSH_TTY:-}" ] && transfer=stream
+  kitten icat \
+    --stdin no \
+    --transfer-mode "$transfer" \
+    --loop -1 \
+    --place "$place" "${size_options[@]}" \
+    "$1" </dev/null >/dev/tty
+  # Tell lf to redraw on selection changes and run the cleaner.
+  exit 1
+}
+
+draw_cached_animation() {
+  local cache_dir hash out tmp
+  cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/lf/animations"
+  mkdir -p "$cache_dir"
+
+  # Bound the work Kitty repeats on every selection. Changing these settings
+  # also changes the cache key; source edits invalidate it automatically.
+  hash="$(printf '%s\0%s\0%s' "$file" "$(stat -c '%s:%y' -- "$file")" \
+    'v1:6s:10fps:480px:bayer' | sha256sum)"
+  hash="${hash%% *}"
+  out="$cache_dir/$hash.gif"
+
+  if [ ! -s "$out" ]; then
+    tmp="$(mktemp "$cache_dir/$hash.XXXXXX.gif")" || exit 1
+    trap 'rm -f -- "$tmp"' EXIT
+    # Input-side -t stops decoding after six seconds, including palettegen's
+    # analysis pass. No audio or interactive stdin is needed for a preview.
+    if timeout -k 2s 15s ffmpeg -hide_banner -loglevel error -nostdin \
+      -threads 2 -t 6 -i "$file" -an -sn -dn \
+      -filter_complex_threads 2 \
+      -filter_complex \
+      "[0:v:0]fps=10,scale=w='min(480,iw)':h='min(480,ih)':force_original_aspect_ratio=decrease:flags=bilinear,split[a][b];[a]palettegen=stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=3[v]" \
+      -map '[v]' -frames:v 60 -loop 0 -y "$tmp" >/dev/null 2>&1 &&
+      [ -s "$tmp" ]; then
+      mv -- "$tmp" "$out"
+    else
+      printf 'Animation preview unavailable\n'
+      exit 1
+    fi
+  fi
+
+  draw "$out" animation
+}
+
+draw_cached_image() {
+  cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/lf/images"
+  mkdir -p "$cache_dir"
+
+  hash="$(printf '%s:%s:%s' "$file" "$(stat -c %s -- "$file")" "$(stat -c %Y -- "$file")" | sha256sum | awk '{print $1}')"
+  out="$cache_dir/$hash.png"
+
+  if [ ! -f "$out" ]; then
+    tmp="$cache_dir/$hash.$$.png"
+    magick "$file[0]" -auto-orient -thumbnail '1600x1600>' "$tmp" >/dev/null 2>&1 &&
+      mv -- "$tmp" "$out"
+    [ -f "$tmp" ] && rm -- "$tmp"
+  fi
+
+  [ -f "$out" ] && draw "$out"
   draw "$file"
+}
+
+mime="$(file -Lb --mime-type -- "$file")"
+
+# WebM is sometimes identified as Matroska rather than video/webm.
+case "${file,,}" in
+*.webm) play_live; draw_cached_animation ;;
+esac
+
+case "$mime" in
+image/gif | video/webm)
+  play_live
+  draw_cached_animation
   ;;
+
+image/webp)
+  draw "$file" animation
+  ;;
+
+image/*)
+  draw_cached_image
+  ;;
+
 video/*)
-  draw "$(vidthumb "$file")"
+  play_live
+  thumb="$HOME/.local/bin/scripts/vidthumb"
+  draw "$("$thumb" "$file")"
   ;;
-txt/*)
-  bat "$file"
+
+application/pdf)
+  cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/lf/pdf"
+  mkdir -p "$cache_dir"
+
+  hash="$(printf '%s:%s' "$file" "$(stat -c %Y -- "$file")" | sha256sum | awk '{print $1}')"
+  out="$cache_dir/$hash.png"
+
+  if [ ! -f "$out" ]; then
+    pdftoppm \
+      -f 1 \
+      -l 1 \
+      -singlefile \
+      -png \
+      -scale-to 1600 \
+      -- "$file" "$cache_dir/$hash" >/dev/null 2>&1
+  fi
+
+  [ -f "$out" ] && draw "$out"
+  ;;
+
+text/* | application/json | application/xml | application/x-shellscript)
+  bat --style=numbers --color=always --line-range :200 -- "$file"
+  exit 0
   ;;
 esac
 

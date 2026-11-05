@@ -1,0 +1,220 @@
+#!/usr/bin/env python3
+"""Play one muted mpv preview in the owning lf client's Kitty preview pane."""
+
+import base64
+from collections import deque
+import contextlib
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import select
+import signal
+import struct
+import subprocess
+import sys
+import tempfile
+import termios
+import uuid
+
+HERE = Path(__file__).resolve().parent
+APC = re.compile(rb"\x1b_G([^\x1b]*)\x1b\\")
+CURSOR = re.compile(rb"\x1b\[(\d*);(\d*)H")
+
+
+def identity(pid):
+    try:
+        # starttime prevents a reused PID from inheriting another lf's player.
+        return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
+    except (OSError, IndexError):
+        return None
+
+
+def session():
+    owner = int(os.environ.get("id", "0"))
+    if owner <= 0 or not (birth := identity(owner)):
+        raise ValueError("mpv previews require a live lf client")
+    root = Path(os.environ.get("XDG_RUNTIME_DIR", f"/tmp/lf-mpv-{os.getuid()}"))
+    root = root / "lf-mpv-preview" / f"{owner}-{birth}"
+    root.mkdir(mode=0o700, parents=True, exist_ok=True)
+    return owner, birth, root
+
+
+@contextlib.contextmanager
+def locked(path):
+    with path.open("a") as gate:
+        fcntl.flock(gate, fcntl.LOCK_EX)
+        yield
+
+
+def read_state(root):
+    try:
+        return json.loads((root / "state.json").read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def write_state(root, state):
+    temporary = root / f"state-{os.getpid()}.tmp"
+    temporary.write_text(json.dumps(state))
+    temporary.replace(root / "state.json")
+
+
+def start(source, width, height, x, y):
+    owner, birth, root = session()
+    with open("/dev/tty", "wb", buffering=0) as tty:
+        rows, cols, px, py = struct.unpack(
+            "HHHH", fcntl.ioctl(tty, termios.TIOCGWINSZ, b"\0" * 8)
+        )
+        if not rows or not cols or not px or not py:
+            raise ValueError("terminal does not report pixel dimensions")
+        source = str(Path(source).resolve())
+        stat = Path(source).stat()
+        geometry = [width, height, x, y, round(width * px / cols), round(height * py / rows)]
+        key = [source, stat.st_size, stat.st_mtime_ns, *geometry]
+        with locked(root / "control.lock"):
+            state = read_state(root)
+            if (state.get("key") == key and state.get("birth")
+                    and identity(state.get("worker", 0)) == state["birth"]):
+                return
+            token = uuid.uuid4().hex
+            state = dict(token=token, key=key, owner=owner, owner_birth=birth,
+                         tty=os.readlink(f"/proc/{owner}/fd/0"), geometry=geometry,
+                         image_id=int(token[:7], 16) + 1)
+            write_state(root, state)
+            # No inherited lf preview pipe: lf must see EOF immediately.
+            with (root / "player.log").open("ab") as log:
+                worker = subprocess.Popen(
+                    [sys.executable, str(HERE / "mpv-preview"), "run", str(root), token],
+                    stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=log,
+                    start_new_session=True, close_fds=True,
+                )
+            state.update(worker=worker.pid, birth=identity(worker.pid))
+            write_state(root, state)
+
+
+def stop():
+    _, _, root = session()
+    with locked(root / "control.lock"):
+        write_state(root, {})
+        # Wait for the old player and its final graphics deletion before a new
+        # static preview can draw. Queued stale workers check their token first.
+        with locked(root / "render.lock"):
+            pass
+
+
+def current(root, token, state):
+    return (read_state(root).get("token") == token
+            and identity(state["owner"]) == state["owner_birth"])
+
+
+def run(root, token):
+    with locked(root / "render.lock"):
+        state = read_state(root)
+        if state.get("token") != token or not current(root, token, state):
+            return
+        width, height, x, y, px, py = state["geometry"]
+        image_id = state["image_id"]
+        command = [
+            "mpv", "--no-config", "--load-scripts=no", "--terminal=no",
+            "--input-terminal=no", "--input-default-bindings=no", "--audio=no",
+            "--sub=no", "--osc=no", "--osd-level=0", "--profile=sw-fast",
+            "--hwdec=auto-copy", "--vd-lavc-threads=2", "--vo=kitty",
+            "--vo-kitty-config-clear=no", "--vo-kitty-alt-screen=no",
+            "--vo-kitty-use-shm=yes", f"--vo-kitty-cols={width}",
+            f"--vo-kitty-rows={height}", f"--vo-kitty-width={px}",
+            f"--vo-kitty-height={py}", "--video-align-y=-1",
+            "--start=0", "--ab-loop-a=0", "--ab-loop-b=20",
+            "--ab-loop-count=inf", "--loop-file=inf",
+            f"--script={HERE / 'preview-midpoint.lua'}",
+            f"--input-ipc-server={root / 'mpv.sock'}", "--", state["key"][0],
+        ]
+        snapshots = deque()
+        player = subprocess.Popen(command, stdin=subprocess.DEVNULL,
+                                  stdout=subprocess.PIPE, close_fds=True)
+        signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
+        signal.signal(signal.SIGINT, lambda *_: sys.exit(0))
+        try:
+            with open(state["tty"], "wb", buffering=0) as tty:
+                buffer = b""
+                row, col = y + 1, x + 1
+                while player.poll() is None and current(root, token, state):
+                    ready, _, _ = select.select([player.stdout], [], [], 0.05)
+                    if not ready:
+                        continue
+                    data = os.read(player.stdout.fileno(), 65536)
+                    if not data:
+                        break
+                    buffer += data
+                    while match := APC.search(buffer):
+                        positions = CURSOR.findall(buffer[:match.start()])
+                        if positions:
+                            r, c = positions[-1]
+                            row, col = y + max(1, int(r or 0)), x + max(1, int(c or 0))
+                        graphics = match[1]
+                        buffer = buffer[match.end():]
+                        # Only relay frame packets. mpv's normal startup/exit
+                        # sequences alter cursor/mouse modes owned by lf.
+                        if not graphics.startswith(b"a=T,"):
+                            continue
+                        if not current(root, token, state):
+                            break
+                        graphics = graphics.replace(b"a=T,", f"a=T,i={image_id},".encode(), 1)
+                        # A shared-memory packet is already complete. mpv 0.41
+                        # marks it m=1, which Kitty treats as an unfinished chunk.
+                        graphics = graphics.replace(b",m=1;", b",m=0;", 1)
+                        header, payload = graphics.split(b";", 1)
+                        # Kitty unlinks received SHM objects. Give it a unique
+                        # snapshot so it cannot unlink mpv's next frame or read
+                        # pixels while the decoder is replacing them.
+                        name = base64.b64decode(payload).lstrip(b"/").decode()
+                        try:
+                            pixels = (Path("/dev/shm") / name).read_bytes()
+                        except FileNotFoundError:
+                            continue
+                        fd, snapshot = tempfile.mkstemp(prefix="lf-mpv-", dir="/dev/shm")
+                        with os.fdopen(fd, "wb") as output:
+                            output.write(pixels)
+                        snapshots.append(Path(snapshot))
+                        while len(snapshots) > 4:
+                            snapshots.popleft().unlink(missing_ok=True)
+                        payload = base64.b64encode(("/" + Path(snapshot).name).encode())
+                        graphics = header + b";" + payload
+                        packet = (f"\x1b7\x1b[{row};{col}H\x1b_G".encode()
+                                  + graphics + b"\x1b\\\x1b8")
+                        # Shared memory keeps the entire packet tiny; one write
+                        # saves/restores the cursor without disturbing lf input.
+                        os.write(tty.fileno(), packet)
+        finally:
+            if player.poll() is None:
+                player.terminate()
+                try:
+                    player.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    player.kill()
+                    player.wait()
+            player.stdout.close()
+            for snapshot in snapshots:
+                snapshot.unlink(missing_ok=True)
+            with open(state["tty"], "wb", buffering=0) as tty:
+                os.write(tty.fileno(), f"\x1b_Ga=d,d=I,i={image_id},q=2\x1b\\".encode())
+
+
+def main():
+    if sys.argv[1] == "start":
+        start(sys.argv[2], *(int(v) for v in sys.argv[3:7]))
+    elif sys.argv[1] == "stop":
+        stop()
+    elif sys.argv[1] == "run":
+        run(Path(sys.argv[2]), sys.argv[3])
+    else:
+        raise ValueError("expected start, stop, or run")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, ValueError) as error:
+        print(f"lf mpv preview: {error}", file=sys.stderr)
+        sys.exit(1)
