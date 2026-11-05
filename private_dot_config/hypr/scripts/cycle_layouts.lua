@@ -6,6 +6,7 @@ local function notify_layout(layout)
 	hl.exec_cmd(string.format([[notify-send -a "Hyprland" -u low -t 1500 "Layout: %s"]], pretty))
 end
 
+-- 1. Layout controls
 hl.bind(meta .. "+ TAB", function()
 	local layouts = { "scrolling", "dwindle", "master", "monocle" }
 	local workspace = hl.get_active_workspace()
@@ -24,4 +25,4 @@ hl.bind(meta .. "+ TAB", function()
 	end
 	hl.workspace_rule({ workspace = workspace.name, layout = next_layout })
 	notify_layout(next_layout)
-end)
+end, { description = "Cycle workspace layout" })
