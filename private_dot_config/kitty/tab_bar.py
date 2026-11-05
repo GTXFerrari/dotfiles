@@ -1,14 +1,17 @@
 from kitty.fast_data_types import Screen
-from kitty.tab_bar import DrawData, ExtraData, TabBarData, as_rgb, draw_title
+from kitty.tab_bar import (
+    DrawData,
+    ExtraData,
+    TabBarData,
+    as_rgb,
+    color_as_int,
+    draw_title,
+)
 
-# ── Tokyo Night palette ────────────────────────────────────────────────────────
-BAR_BG = as_rgb(0x16161E)  # tab bar background
-ACTIVE_BG = as_rgb(0x7AA2F7)  # active tab fill  (blue)
-ACTIVE_FG = as_rgb(0x1A1B26)  # active tab text  (dark)
-INACTIVE_BG = as_rgb(0x24283B)  # inactive tab fill
-INACTIVE_FG = as_rgb(0x565F89)  # inactive tab text
-BELL_FG = as_rgb(0xF7768E)  # bell indicator   (red)
-ACTIVITY_FG = as_rgb(0xE0AF68)  # activity dot     (yellow)
+# Theme-driven accents. The tab body colors come from Kitty's resolved
+# active_tab_* and inactive_tab_* options, so included themes can control them.
+BELL_FG = as_rgb(0xFFB4AB)
+ACTIVITY_FG = as_rgb(0xC2C5DD)
 
 # ── Nerd Font glyphs ──────────────────────────────────────────────────────────
 LEFT_CAP = "\ue0b6"  # rounded left
@@ -32,11 +35,12 @@ def draw_tab(
     is_last: bool,
     extra_data: ExtraData,
 ) -> int:
-    tab_bg = ACTIVE_BG if tab.is_active else INACTIVE_BG
-    tab_fg = ACTIVE_FG if tab.is_active else INACTIVE_FG
+    bar_bg = as_rgb(color_as_int(draw_data.default_bg))
+    tab_bg = as_rgb(draw_data.tab_bg(tab))
+    tab_fg = as_rgb(draw_data.tab_fg(tab))
 
     # ── Left pill cap ─────────────────────────────────────────────────────────
-    _set_colors(screen, tab_bg, BAR_BG)
+    _set_colors(screen, tab_bg, bar_bg)
     screen.draw(LEFT_CAP)
 
     # ── Tab body ──────────────────────────────────────────────────────────────
@@ -62,11 +66,11 @@ def draw_tab(
     screen.draw(" ")
 
     # ── Right pill cap ────────────────────────────────────────────────────────
-    _set_colors(screen, tab_bg, BAR_BG)
+    _set_colors(screen, tab_bg, bar_bg)
     screen.draw(RIGHT_CAP)
 
     # ── Gap between pills ─────────────────────────────────────────────────────
-    _set_colors(screen, BAR_BG, BAR_BG)
+    _set_colors(screen, bar_bg, bar_bg)
     screen.draw(" ")
 
     return screen.cursor.x
