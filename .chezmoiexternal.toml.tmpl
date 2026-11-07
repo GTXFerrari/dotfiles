@@ -1,0 +1,8 @@
+{{ if eq .chezmoi.os "windows" -}}
+# Pin the public Windows build instead of committing its build metadata.
+["AppData/Roaming/lf/sixel-preview/tools/Chafa.exe"]
+    type = "archive-file"
+    url = "https://hpjansson.org/chafa/releases/static/chafa-1.18.3-1-x86_64-windows.zip"
+    path = "chafa-1.18.3-1-x86_64-win/Chafa.exe"
+    checksum.sha256 = "3d7b43cab1c9d9116024ab48664db8910e3eabf0912720828d5e7ad1b80194fa"
+{{ end -}}

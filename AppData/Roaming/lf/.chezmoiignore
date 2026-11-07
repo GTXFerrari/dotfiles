@@ -1,0 +1,7 @@
+# Ignore files not supplied for the current OS.
+{{- $variant := joinPath .chezmoi.sourceDir "os" "lf" .chezmoi.os }}
+{{- range $name := list "lfrc" "sixel-preview/cleaner-video.cmd" "sixel-preview/lf-video.exe" "sixel-preview/preview-midpoint.lua" "sixel-preview/preview-sixel.cmd" "sixel-preview/preview-sixel.ps1" "sixel-preview/tools/README.TXT" }}
+{{- if not (stat (joinPath $variant $name)) }}
+{{ $name }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,57 @@
+#!/bin/sh
+
+play_live() {
+  [ "$mode" = preload ] && exit 1
+  [ -n "${KITTY_WINDOW_ID:-}" ] && [ -z "${TMUX:-}${STY:-}${SSH_CONNECTION:-}${SSH_TTY:-}" ] || return 1
+  "$(dirname "$0")/mpv-preview" start "$file" "$w" "$h" "$x" "$y" || return 1
+  exit 1
+}
+
+draw() {
+  kitty +kitten icat --silent --stdin no --transfer-mode file --loop -1 --scale-up --place "${w}x${h}@${x}x${y}" "$1" </dev/null >/dev/tty
+  exit 1
+}
+
+file="$1"
+w="$2"
+h="$3"
+x="$4"
+y="$5"
+mode="${6:-preview}"
+mime=$(file -Lb --mime-type "$file")
+# Some file versions identify WebM as application/octet-stream or Matroska.
+case "$file" in
+  *.[wW][eE][bB][mM]) mime=video/webm ;;
+esac
+
+# Graphics must only be drawn for the selected file, never during preloading.
+if [ "$mode" = preload ]; then
+  case "$mime" in
+    image/*|video/*) exit 1 ;;
+  esac
+fi
+
+case "$mime" in
+image/gif)
+  play_live
+  draw "$file"
+  ;;
+image/*)
+  draw "$file"
+  ;;
+video/*)
+  play_live
+  if animation=$("$(dirname "$0")/video-preview" "$file"); then
+    draw "$animation"
+  fi
+  # Retain the still-thumbnail fallback for files ffmpeg cannot animate.
+  if thumbnail=$(vidthumb "$file" 2>/dev/null) && [ -f "$thumbnail" ]; then
+    draw "$thumbnail"
+  fi
+  ;;
+txt/*)
+  bat "$file"
+  ;;
+esac
+
+pistol "$file"

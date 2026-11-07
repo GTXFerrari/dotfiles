@@ -1,0 +1,5 @@
+# BEGIN SIXEL image previews
+set preview true
+set previewer "@HOME@/AppData/Roaming/lf/sixel-preview/lf-video.exe"
+set cleaner "@HOME@/AppData/Roaming/lf/sixel-preview/cleaner-video.cmd"
+# END SIXEL image previews
