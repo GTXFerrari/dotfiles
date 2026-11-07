@@ -1,0 +1,48 @@
+# Repository documentation and raw OS variants are not destination files.
+README.md
+os
+
+# Linux desktop, services, package manager, and media helpers.
+{{ if ne .chezmoi.os "linux" }}
+.config/chromium-flags.conf
+.config/electron-flags.conf
+.config/gamemode.ini
+.config/hypr
+.config/mpd
+.config/pacman
+.config/pipewire
+.config/systemd
+.config/uwsm
+.config/xdg-desktop-portal
+.config/mpv/script-opts
+.config/mpv/scripts
+{{ end }}
+
+# Unix applications use ~/.config; native Windows apps use AppData.
+{{ if eq .chezmoi.os "windows" }}
+.bashrc
+.zshrc
+.config
+{{ else }}
+AppData
+Documents
+{{ end }}
+
+# Reserve macOS's native configuration tree for macOS.
+{{ if ne .chezmoi.os "darwin" }}
+Library
+{{ end }}
+
+# Do not manage lf on Windows until its real configuration has been imported.
+{{ if eq .chezmoi.os "windows" }}
+{{ if not (stat (joinPath .chezmoi.sourceDir "os" "lf" "windows" "lfrc")) }}
+AppData/Roaming/lf
+{{ end }}
+{{ end }}
+
+# Keep the Linux lf configuration off macOS until the macOS variant is present.
+{{ if eq .chezmoi.os "darwin" }}
+{{ if not (stat (joinPath .chezmoi.sourceDir "os" "lf" "darwin" "lfrc")) }}
+.config/lf
+{{ end }}
+{{ end }}

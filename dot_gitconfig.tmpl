@@ -1,6 +1,6 @@
 [user]
-	email = jakeferrari93@gmail.com
-	name = Jake Ferrari
+	email = {{ .gitEmail | quote }}
+	name = {{ .gitName | quote }}
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f

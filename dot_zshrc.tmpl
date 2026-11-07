@@ -8,7 +8,7 @@ HISTFILE=$HOME/.config/.zhistory
 setopt HIST_EXPIRE_DUPS_FIRST
 
 # Use neovim for vim if present
-[ -x '$(command -v nvim)' ] && alias vim='nvim' vimdiff='nvim -d'
+(( $+commands[nvim] )) && alias vim='nvim' vimdiff='nvim -d'
 
 # Vim Bindings
 bindkey -v
@@ -28,9 +28,9 @@ export EDITOR='nvim'
 export TERMINAL='kitty'
 
 #PATH
-path+=('/home/jake/.local/bin/')
-path+=('/home/jake/.cargo/bin/')
-path+=('/home/jake/.local/bin/scripts/')
+path+=("$HOME/.local/bin/")
+path+=("$HOME/.cargo/bin/")
+path+=("$HOME/.local/bin/scripts/")
 export PATH
 
 # Starship
@@ -45,7 +45,11 @@ alias \
 	cls='clear' \
 	ll='ls -al' \
 	la='ls -al' \
+{{ if eq .chezmoi.os "darwin" -}}
+  rm='rm -vi' \
+{{ else -}}
   rm='rm -vI' \
+{{ end -}}
   mv='mv -iv' \
   cp='cp -iv' \
   mkdir='mkdir -pv' \
@@ -65,6 +69,7 @@ alias \
 	smci='sudo make clean install' \
 	smcu='sudo make clean uninstall' \
 
+{{ if eq .chezmoi.os "linux" -}}
 # Grub (Arch only)
 alias \
 	grubin='sudo grub-install --target=x86_64-efi --efi-directory=/boot --bootloader=GRUB' \
@@ -89,13 +94,19 @@ alias \
 	pacup='sudo pacman -Syu' \
   reflec='sudo reflector -c "United States" -a 12 -p https --sort rate --save /etc/pacman.d/mirrorlist' \
 
+{{ end -}}
 # Colorize
 alias \
+{{ if eq .chezmoi.os "darwin" -}}
+	ls='ls -hG' \
+	grep='grep --color=auto'
+{{ else -}}
 	ls='ls -hN --color=auto --group-directories-first' \
 	grep='grep --color=auto' \
 	diff='diff --color=auto' \
 	ip='ip --color=auto' \
 
+{{ end -}}
 # Programs
 alias \
 	ff='fastfetch' \
@@ -110,11 +121,13 @@ alias \
   
 
 
+{{ if eq .chezmoi.os "linux" -}}
 # Easyeffects
 alias \
 	LCD2='easyeffects -l LCD2' \
 	JBL='easyeffects -l JBL' \
 
+{{ end -}}
 # Python VENV
 alias \
   comfy='source ~/Code/Python/VENV/comfyui/bin/activate' \
@@ -130,6 +143,7 @@ alias \
   dcu='docker compose up -d' \
   dcd='docker compose down' \
 
+{{ if eq .chezmoi.os "linux" -}}
 alias \
   sunon='hyprctl output create headless HEADLESS-2' \
   sunoff='hyprctl output remove HEADLESS-2' \
@@ -142,16 +156,29 @@ alias grab-session='
   export HYPRLAND_INSTANCE_SIGNATURE=$(ls /run/user/1000/hypr/ | tail -1)
 '
 
+{{ end -}}
 # Govc
 govc-vcenter() { set -a; source ~/.config/govc/vcenter.env; set +a; }
 govc-esxi() { set -a; source ~/.config/govc/esxi.env; set +a; }
 
 # Source Plugins
-source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-eval "$(starship init zsh)"
-eval "$(zoxide init zsh)"
+{{ if eq .chezmoi.os "darwin" -}}
+if (( $+commands[brew] )); then
+  zsh_plugin_prefix="$(brew --prefix)"
+  [[ -r "$zsh_plugin_prefix/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ]] && \
+    source "$zsh_plugin_prefix/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+  [[ -r "$zsh_plugin_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && \
+    source "$zsh_plugin_prefix/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  unset zsh_plugin_prefix
+fi
+{{ else -}}
+[[ -r /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh ]] && \
+  source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+[[ -r /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+{{ end }}
+(( $+commands[starship] )) && eval "$(starship init zsh)"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 
 # Added by cua-driver-rs installer — see https://github.com/trycua/cua
-export PATH="/home/jake/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"

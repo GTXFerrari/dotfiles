@@ -36,7 +36,7 @@ hl.bind(meta .. "+ SHIFT + L", hl.dsp.exec_cmd(ipc .. " lockScreen lock"), { des
 hl.bind(meta .. "+ F", hl.dsp.window.float({ action = "toggle" }), { description = "Float a window" })
 hl.bind(
 	meta .. "+ CTRL + K",
-	hl.dsp.exec_cmd("/home/jake/.config/hypr/scripts/wvkbd.sh toggle"),
+	hl.dsp.exec_cmd(os.getenv("HOME") .. "/.config/hypr/scripts/wvkbd.sh toggle"),
 	{ description = "Toggle on-screen keyboard" }
 )
 

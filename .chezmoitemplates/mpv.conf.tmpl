@@ -7,8 +7,13 @@ osc=yes
 
 [quality]
 vo=gpu-next
+{{ if eq .chezmoi.os "linux" -}}
 # Prefer Vulkan on the RTX 4090, with OpenGL available as a fallback.
 gpu-api=vulkan,opengl
+{{ else -}}
+# Let mpv choose the graphics API supported by this platform.
+gpu-api=auto
+{{ end -}}
 profile=high-quality
 # Reduce scaling halos; also included in newer mpv high-quality presets.
 scale-antiring=0.6

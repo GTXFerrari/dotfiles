@@ -13,6 +13,7 @@ setw -g pane-base-index 1
 set -g menu-border-lines rounded
 set -g popup-border-lines rounded
 
+{{ if eq .chezmoi.os "linux" -}}
 # Rounded session and title/clock segments using Noctalia's live palette.
 set -g status-left-length 32
 set -g status-right-length 64
@@ -24,3 +25,8 @@ set -g @rounded_window_bg '#{?window_bell_flag,#{@noctalia_error_container},#{?#
 set -g window-status-format '#[fg=#{E:@rounded_window_bg},bg=#{@noctalia_surface_container_low},nobold]#[default] #I:#W#F #[fg=#{E:@rounded_window_bg},bg=#{@noctalia_surface_container_low},nobold]'
 set -g window-status-current-format '#{E:window-status-format}'
 source-file -q "$XDG_CONFIG_HOME/tmux/themes/noctalia.conf"
+{{ else -}}
+# Use the terminal's palette when Noctalia is unavailable.
+set -g status-left ' #S '
+set -g status-right ' %H:%M %d-%b-%y '
+{{ end -}}

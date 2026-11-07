@@ -22,7 +22,7 @@ require("config/bitwarden_web_fix").setup()
 require("scripts/cycle_layouts")
 
 -- This loads Noctalia-generated Hyprland colors.
-dofile("/home/jake/.config/hypr/noctalia/noctalia-colors.lua")
+dofile(os.getenv("HOME") .. "/.config/hypr/noctalia/noctalia-colors.lua")
 
 -- For Noctalia Color templates
 require("noctalia")
