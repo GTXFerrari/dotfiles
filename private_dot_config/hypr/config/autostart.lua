@@ -29,9 +29,6 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("printf 'Xft.dpi: 192\\n' | xrdb -merge -; uwsm app -- steam", {
 		workspace = "9 silent",
 	})
-	hl.exec_cmd("uwsm app -- obs", {
-		workspace = "10 silent",
-	})
 	hl.exec_cmd("uwsm app -- easyeffects")
 	hl.exec_cmd("uwsm app -- /opt/piavpn/bin/pia-client --quiet")
 end)
