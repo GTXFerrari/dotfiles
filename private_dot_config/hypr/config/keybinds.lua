@@ -10,7 +10,8 @@
 
 -- Variables
 local meta = "SUPER"
-local terminal = "uwsm app -- kitty"
+-- local terminal = "uwsm app -- kitty"
+local terminal = "uwsm app -- ghostty +new-window"
 local tui_fileManager = "uwsm app -- kitty --class lf-kitty -e lf"
 local gui_fileManager = "uwsm app -- nautilus"
 local ipc = "noctalia msg"
@@ -23,11 +24,14 @@ hl.bind(meta .. "+ SHIFT + Q", function()
 	-- A forwarded client quit shortcut must not log out the streaming host.
 	local runtime = os.getenv("XDG_RUNTIME_DIR")
 	local instance = os.getenv("HYPRLAND_INSTANCE_SIGNATURE")
-	local stream_state = runtime and instance
+	local stream_state = runtime
+		and instance
 		and io.open(runtime .. "/sunshine-vmon-" .. instance .. "/state.json", "r")
 	if stream_state then
 		stream_state:close()
-		hl.exec_cmd("notify-send 'Streaming session active' 'Use Moonlight to disconnect or quit the streaming application.'")
+		hl.exec_cmd(
+			"notify-send 'Streaming session active' 'Use Moonlight to disconnect or quit the streaming application.'"
+		)
 		return
 	end
 	hl.exec_cmd("uwsm stop")
@@ -43,7 +47,7 @@ hl.bind(
 -- 2. Application Keybinds
 hl.bind(meta .. "+ SHIFT + Return", hl.dsp.exec_cmd(terminal), { description = "Launch Kitty" })
 hl.bind(meta .. "+ E", hl.dsp.exec_cmd(tui_fileManager), { description = "launch lf file manager (float)" })
-hl.bind(meta .. "+ SHIFT + E", hl.dsp.exec_cmd(gui_fileManager), { description = "Launch dolphin file manager" })
+hl.bind(meta .. "+ SHIFT + E", hl.dsp.exec_cmd(gui_fileManager), { description = "Launch nautilus file manager" })
 hl.bind("CTRL + SHIFT + Escape", hl.dsp.exec_cmd("uwsm app -- missioncenter"), { description = "Launch missioncenter" })
 
 -- 3. Window Management
