@@ -7,11 +7,13 @@ x="$4"
 y="$5"
 mode="${6:-preview}"
 
-# Use mpv for video and animated GIF/WebM previews. Keep Kitty's existing
-# static image previews as a fallback when live output is unavailable.
+# Use mpv for local video and animated GIF/WebM previews in Kitty and Ghostty.
 play_live() {
   [ "$mode" = preload ] && exit 1
-  [ -n "${KITTY_WINDOW_ID:-}" ] && [ -z "${TMUX:-}${STY:-}${SSH_CONNECTION:-}${SSH_TTY:-}" ] || return 1
+  [ -z "${TMUX:-}${STY:-}${SSH_CONNECTION:-}${SSH_TTY:-}" ] || return 1
+  if [ -z "${KITTY_WINDOW_ID:-}" ] && [ "${TERM_PROGRAM:-}" != ghostty ]; then
+    return 1
+  fi
   "$(dirname -- "$0")/mpv-preview" start "$file" "$w" "$h" "$x" "$y" || return 1
   exit 1
 }
@@ -121,8 +123,6 @@ image/*)
 
 video/*)
   play_live
-  thumb="$HOME/.local/bin/scripts/vidthumb"
-  draw "$("$thumb" "$file")"
   ;;
 
 application/pdf)
