@@ -1,3 +1,6 @@
+{{- if eq .chezmoi.os "darwin" -}}
+{{- include "os/kitty/darwin/tab_bar.py" -}}
+{{- else -}}
 import re
 
 from kitty.fast_data_types import Screen, wcswidth
@@ -73,3 +76,4 @@ def draw_tab(
 
     # Kitty treats the end of the click target as inclusive.
     return screen.cursor.x - 1
+{{ end -}}

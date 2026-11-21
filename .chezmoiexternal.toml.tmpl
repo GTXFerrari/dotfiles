@@ -1,3 +1,9 @@
+{{ if eq .chezmoi.os "darwin" -}}
+[".config/kitty/current-theme.conf"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/folke/tokyonight.nvim/6e0bfd6836e09a4c66184a33f1266e964f920299/extras/kitty/tokyonight_storm.conf"
+    checksum.sha256 = "3943683cd50f13c59ea2825a6bd16e8aff26381c78fd541b458603bd0231c5b4"
+{{ end -}}
 {{ if eq .chezmoi.os "windows" -}}
 # Pin the public Windows build instead of committing its build metadata.
 ["AppData/Roaming/lf/sixel-preview/tools/Chafa.exe"]

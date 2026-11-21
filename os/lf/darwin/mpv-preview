@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 import select
 import signal
+import socket
 import struct
 import subprocess
 import sys
@@ -145,6 +146,26 @@ def current(root, token, state):
             and identity(state["owner"]) == state["owner_birth"])
 
 
+def video_placement(header, osd, cell_width, cell_height):
+    left, right, top, bottom = (max(0, osd[key]) for key in ("ml", "mr", "mt", "mb"))
+    if not (left or right or top or bottom):
+        return header, 0, 0
+
+    width, height = osd["w"], osd["h"]
+    video_width, video_height = width - left - right, height - top - bottom
+    fields = header.split(b",")
+    if (f"s={width}".encode() not in fields or f"v={height}".encode() not in fields
+            or video_width <= 0 or video_height <= 0):
+        return header, 0, 0
+
+    # mpv 0.42 sends the whole canvas. Display the video rectangle at its
+    # original pixel position so the terminal background shows around it.
+    col, offset_x = divmod(left, cell_width)
+    row, offset_y = divmod(top, cell_height)
+    crop = f",x={left},y={top},w={video_width},h={video_height},X={offset_x},Y={offset_y}"
+    return header + crop.encode(), row, col
+
+
 def discard_snapshot(snapshot):
     # Kitty normally unlinks the snapshot as soon as it has read the frame.
     with contextlib.suppress(FileNotFoundError):
@@ -154,12 +175,19 @@ def discard_snapshot(snapshot):
 def run(root, token, tty_fd):
     # Inherit an open tty descriptor: macOS has no /proc/<pid>/fd, and a
     # detached worker cannot reopen /dev/tty without a controlling terminal.
-    with os.fdopen(tty_fd, "wb", buffering=0) as tty, locked(root / "render.lock"):
+    with (
+        os.fdopen(tty_fd, "wb", buffering=0) as tty,
+        locked(root / "render.lock"),
+        contextlib.ExitStack() as stack,
+    ):
         state = read_state(root)
         if state.get("token") != token or not current(root, token, state):
             return
         width, height, x, y, px, py = state["geometry"]
+        cell_width, cell_height = max(1, round(px / width)), max(1, round(py / height))
         image_id = state["image_id"]
+        ipc, child_ipc = socket.socketpair()
+        stack.enter_context(ipc)
         command = [
             "mpv", "--no-config", "--load-scripts=no", "--terminal=no",
             "--input-terminal=no", "--input-default-bindings=no", "--audio=no",
@@ -175,24 +203,40 @@ def run(root, token, tty_fd):
             "--start=0", "--ab-loop-a=0", "--ab-loop-b=20",
             "--ab-loop-count=inf", "--loop-file=inf",
             f"--script={HERE / 'preview-midpoint.lua'}",
-            f"--input-ipc-server={root / 'mpv.sock'}", "--", state["key"][0],
+            f"--input-ipc-server={root / 'mpv.sock'}",
+            f"--input-ipc-client=fd://{child_ipc.fileno()}", "--", state["key"][0],
         ]
         snapshots = deque()
-        player = subprocess.Popen(command, stdin=subprocess.DEVNULL,
-                                  stdout=subprocess.PIPE, close_fds=True)
+        with child_ipc:
+            player = subprocess.Popen(command, stdin=subprocess.DEVNULL,
+                                      stdout=subprocess.PIPE, pass_fds=(child_ipc.fileno(),))
         signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
         signal.signal(signal.SIGINT, lambda *_: sys.exit(0))
         try:
+            ipc.sendall(b'{"command":["observe_property",1,"osd-dimensions"]}\n')
+            ipc_buffer = b""
+            osd = None
             buffer = b""
             row, col = y + 1, x + 1
             while player.poll() is None and current(root, token, state):
-                ready, _, _ = select.select([player.stdout], [], [], 0.05)
-                if not ready:
+                ready, _, _ = select.select([player.stdout, ipc], [], [], 0.05)
+                if ipc in ready:
+                    data = ipc.recv(65536)
+                    if not data:
+                        break
+                    ipc_buffer += data
+                    *messages, ipc_buffer = ipc_buffer.split(b"\n")
+                    for message in messages:
+                        event = json.loads(message)
+                        if event.get("name") == "osd-dimensions":
+                            osd = event.get("data")
+                if player.stdout in ready:
+                    data = os.read(player.stdout.fileno(), 65536)
+                    if not data:
+                        break
+                    buffer += data
+                if not ready or not osd or not osd["w"] or not osd["h"]:
                     continue
-                data = os.read(player.stdout.fileno(), 65536)
-                if not data:
-                    break
-                buffer += data
                 while match := APC.search(buffer):
                     positions = CURSOR.findall(buffer[:match.start()])
                     if positions:
@@ -211,6 +255,9 @@ def run(root, token, tty_fd):
                     # marks it m=1, which Kitty treats as an unfinished chunk.
                     graphics = graphics.replace(b",m=1;", b",m=0;", 1)
                     header, payload = graphics.split(b";", 1)
+                    header, row_offset, col_offset = video_placement(
+                        header, osd, cell_width, cell_height
+                    )
                     # Kitty unlinks received SHM objects. Give it a unique
                     # snapshot so it cannot unlink mpv's next frame or read
                     # pixels while the decoder is replacing them.
@@ -246,7 +293,7 @@ def run(root, token, tty_fd):
                         discard_snapshot(snapshots.popleft())
                     payload = base64.b64encode(("/" + snapshot.name).encode())
                     graphics = header + b";" + payload
-                    packet = (f"\x1b7\x1b[{row};{col}H\x1b_G".encode()
+                    packet = (f"\x1b7\x1b[{row + row_offset};{col + col_offset}H\x1b_G".encode()
                               + graphics + b"\x1b\\\x1b8")
                     # Shared memory keeps the entire packet tiny; one write
                     # saves/restores the cursor without disturbing lf input.

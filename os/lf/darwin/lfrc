@@ -109,8 +109,3 @@ map V push :!nvim<space>
 map W $setsid -f $TERMINAL >/dev/null 2>&1
 
 map Y $printf "%s" "$fx" | xclip -selection clipboard
-
-# Stop live previews before lf restores the terminal on exit.
-cmd on-quit ${{
-    "${XDG_CONFIG_HOME:-$HOME/.config}/lf/mpv-preview" stop
-}}

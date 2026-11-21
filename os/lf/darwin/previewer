@@ -49,9 +49,16 @@ video/*)
     draw "$thumbnail"
   fi
   ;;
-txt/*)
-  bat "$file"
-  ;;
 esac
 
-pistol "$file"
+pistol_bin=$(command -v pistol) || pistol_bin="${GOBIN:-$HOME/go/bin}/pistol"
+if [ -x "$pistol_bin" ] && "$pistol_bin" "$file"; then
+  exit 0
+fi
+
+case "$mime" in
+text/*|application/json|inode/x-empty)
+  exec cat -- "$file"
+  ;;
+esac
+exit 1

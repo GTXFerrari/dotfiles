@@ -1,3 +1,6 @@
+{{- if eq .chezmoi.os "darwin" -}}
+{{- include "os/kitty/darwin/kitty.conf" -}}
+{{- else -}}
 font_size 14.0
 
 enable_audio_bell no
@@ -57,3 +60,4 @@ bold_italic_font auto
 {{ if eq .chezmoi.os "linux" }}include themes/noctalia.conf{{ end }}
 
 
+{{ end -}}
